@@ -1,6 +1,7 @@
 #include "simplifier.h"
 #include "tokenizer.h"
 #include "vector.h"
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,33 +16,27 @@ void print_tree(ExpresionNode *node, int depth) {
     for(int i = 0; i < depth - 1; i++) {
         indent[i] = '\t';
     }
-
-    char old_end_value = *node->token->end_ptr;
-    *node->token->end_ptr = '\0';
-
     printf("%s", indent);
-    switch (node->token->type) {
+    free(indent);
+    switch (node->type) {
         case TokenTypeVariable:
-            printf("variable: %s", node->token->start_ptr);
+            printf("variable: %s", node->name);
             break;
         case TokenTypeNumber:
-            printf("number: %s", node->token->start_ptr);
+            printf("number: %s", node->name);
             break;
         case TokenTypeFunction:
-            printf("function: %s", node->token->start_ptr);
+            printf("function: %s", node->name);
             break;
         case TokenTypeOperator:
         case TokenTypeUnaryOperator:
-            printf("operator: %s", node->token->start_ptr);
+            printf("operator: %s", node->name);
             break;
 
         default:
             break;
     }
-    *node->token->end_ptr = old_end_value;
     printf("\n");
-
-    free(indent);
 
     if (node->is_leaf) {
         return;
@@ -49,117 +44,181 @@ void print_tree(ExpresionNode *node, int depth) {
 
     for(int i = 0;i < node->nodes->length; i++) {
         ExpresionNode *child_node = vector_get(node->nodes, i);
-
         print_tree(child_node, depth + 1);
     }
 }
 
+char *get_node_name_for_number(double number) {
+    // max length 31 items
+    char *name = calloc(32, sizeof(char));
+    sprintf(name, "%lf", number);
+
+    return name;
+}
+
+void remove_nodes(Vector *nodes, Vector *to_remove) {
+    // expects that to_remove values are casted into void ptrs
+    // example
+    // int x = 5;
+    // vector_pushback(to_remove, (void*)x)
+    for(int i = 0; i < to_remove->length; i++) {
+        // because we cast the insert into a void* now we cast into int
+        int index = (int)vector_get(to_remove, i);
+        ExpresionNode *removed_node = vector_remove(nodes, index - i);
+        free(removed_node->name);
+        free(removed_node);
+    }
+}
+
+void compact_add(ExpresionNode *node) {
+    Vector *to_remove = vector_new();
+    double result = 0;
+    for(int i = 0; i < node->nodes->length; i++) {
+        ExpresionNode *child = vector_get(node->nodes, i);
+
+        if (child->type != TokenTypeNumber) {
+            continue;
+        }
+
+        result += child->value;
+
+        // very weird hack we cast to void* so we can then uncast to (int) 
+        // because the vector_pushback signature is Vector* and void*
+        vector_pushback(to_remove, (void*)i);
+    }
+
+    remove_nodes(node->nodes, to_remove);
+    vector_free(to_remove);
+    ExpresionNode *new_node;
+
+    if (node->nodes->length == 0) {
+        vector_free(node->nodes);
+        node->nodes = NULL;
+
+        new_node = node;
+    } else {
+        new_node = calloc(1, sizeof(ExpresionNode));
+        vector_pushback(node->nodes, new_node);
+    }
+
+    new_node->is_leaf = true;
+    new_node->name = get_node_name_for_number(result);
+    new_node->type = TokenTypeNumber;
+    new_node->value = result;
+}
+
+void compact_sub(ExpresionNode *node) {
+    Vector *to_remove = vector_new();
+    double result = 0;
+    for(int i = 0; i < node->nodes->length; i++) {
+        ExpresionNode *child = vector_get(node->nodes, i);
+
+        if (child->type != TokenTypeNumber) {
+            continue;
+        }
+
+        if(i == 0) {
+            result += child->value;
+        } else {
+            result -= child->value;
+        }
+
+        // very weird hack we cast to void* so we can then uncast to (int) 
+        // because the vector_pushback signature is Vector* and void*
+        vector_pushback(to_remove, (void*)i);
+    }
+    remove_nodes(node->nodes, to_remove);
+    vector_free(to_remove);
+    ExpresionNode *new_node;
+
+    if (node->nodes->length == 0) {
+        vector_free(node->nodes);
+        node->nodes = NULL;
+
+        new_node = node;
+    } else {
+        new_node = calloc(1, sizeof(ExpresionNode));
+        vector_pushback(node->nodes, new_node);
+    }
+
+    new_node->is_leaf = true;
+    new_node->name = get_node_name_for_number(result);
+    new_node->type = TokenTypeNumber;
+    new_node->value = result;
+}
+
+void compact_multiply(ExpresionNode *node) {
+    Vector *to_remove = vector_new();
+    double result = 1;
+    for(int i = 0; i < node->nodes->length; i++) {
+        ExpresionNode *child = vector_get(node->nodes, i);
+
+        if (child->type != TokenTypeNumber) {
+            continue;
+        }
+
+        result *= child->value;
+
+        // very weird hack we cast to void* so we can then uncast to (int) 
+        // because the vector_pushback signature is Vector* and void*
+        vector_pushback(to_remove, (void*)i);
+    }
+
+    remove_nodes(node->nodes, to_remove);
+    vector_free(to_remove);
+    ExpresionNode *new_node;
+
+    if (node->nodes->length == 0) {
+        vector_free(node->nodes);
+        node->nodes = NULL;
+
+        new_node = node;
+    } else {
+        new_node = calloc(1, sizeof(ExpresionNode));
+        vector_pushback(node->nodes, new_node);
+    }
+
+    new_node->is_leaf = true;
+    new_node->name = get_node_name_for_number(result);
+    new_node->type = TokenTypeNumber;
+    new_node->value = result;
+}
+
 void compact_operators(ExpresionNode *node) {
-    // will compact leafs for operator 
     if (node->is_leaf) {
         return;
     }
 
-    switch (node->token->type) {
+    switch (node->type) {
         case TokenTypeOperator:
             break;
         default:
             return;
     }
+
     for (int i = 0;i < node->nodes->length; i++) {
         compact_operators(vector_get(node->nodes, i));
     }
 
-    int new_value = INT_MAX;
-    Vector *to_remove = vector_new();
-    for (int i = 1;i < node->nodes->length; i++) {
-        ExpresionNode *child = vector_get(node->nodes, i);
-
-        if (!child->is_leaf) {
-            continue;
-        }
-
-        if (child->token->type == TokenTypeVariable) {
-            continue;
-        }
-
-        double value = strtod(child->token->start_ptr, &child->token->end_ptr);
-
-        int value_rounded = (int) value;
-        if (value - value_rounded != 0) {
-            printf("skipping %lf since its a float %lf\n", value, value - value_rounded);
-            continue;
-        }
-
-        int *to_remove_index = malloc(sizeof(int));
-        *to_remove_index = i;
-        vector_pushback(to_remove, to_remove_index);
-
-        if (new_value == INT_MAX) {
-            new_value = value_rounded;
-            continue;
-        }
-
-
-        switch (*node->token->start_ptr) {
-            case '+':
-                new_value += value_rounded;
-                break;
-            case '-':
-                new_value -= value_rounded;
-                break;
-            case '*':
-            case '/':
-                new_value *= value_rounded;
-                break;
-            default:
-                // if node is not of suported type dont simplify
-                return;
-        }
+    switch (*node->name) {
+        case '+':
+            compact_add(node);
+            break;
+        case '-':
+            compact_sub(node);
+            break;
+        case '*':
+            compact_multiply(node);
+            break;
+        default:
+            return;
     }
-
-    if (to_remove->length == 1){
-        return;
-    }
-
-    for(int i = 0; i < to_remove->length; i++) {
-        int *index = vector_get(to_remove, i);
-        ExpresionNode *child = vector_remove(node->nodes, *index - i);
-
-        free(child);
-
-        printf("removed %d\n", *index);
-        free(index);
-    }
-    vector_free(to_remove);
-    // omg this is so hacky
-    char *content = calloc(sizeof(char), 32);
-    ExpresionNode *new_node = malloc(sizeof(ExpresionNode));
-    sprintf(content, "%d", new_value);
-    new_node->is_leaf = true;
-    new_node->token = malloc(sizeof(LexerToken));
-
-    new_node->token->start_ptr = content;
-    new_node->token->end_ptr = content + strlen(content);
-    new_node->token->type = TokenTypeNumber;
-
-    printf("New node: %p\n", new_node);
-
-
-    vector_pushback(node->nodes, new_node);
 }
 
 void flatten_tree(ExpresionNode *node) {
     if (node->is_leaf) {
         return;
     }
-
-    char old_end_value = *node->token->end_ptr;
-
-    *node->token->end_ptr = '\0';
-    char *node_name = calloc(sizeof(char), strlen(node->token->start_ptr) + 1);
-    strcpy(node_name, node->token->start_ptr);
-    *node->token->end_ptr = old_end_value;
 
     for(int i = 0; i < node->nodes->length; i++) {
         ExpresionNode *child = vector_get(node->nodes, i);
@@ -169,20 +228,13 @@ void flatten_tree(ExpresionNode *node) {
     for(int i = 0; i < node->nodes->length; i++) {
         ExpresionNode *child = vector_get(node->nodes, i);
 
-        old_end_value = *child->token->end_ptr;
-        *child->token->end_ptr = '\0';
-        char *child_name = calloc(sizeof(char), strlen(child->token->start_ptr) + 1);
-        strcpy(child_name, child->token->start_ptr);
-        *child->token->end_ptr = old_end_value;
-
-        bool nodes_have_the_same_name = strcmp(node_name, child_name) == 0;
-        free(child_name);
+        bool nodes_have_the_same_name = strcmp(node->name, child->name) == 0;
 
         if (!nodes_have_the_same_name) {
             continue;
         }
 
-        if (child->token->type != node->token->type) {
+        if (child->type != node->type) {
             continue;
         }
 
@@ -209,8 +261,6 @@ void flatten_tree(ExpresionNode *node) {
         node->nodes = child->nodes;
         free(child);
     }
-
-    free(node_name);
 }
 
 ExpresionNode *convert_to_tree(Vector *tokens, Evaluator *evaluator) {
@@ -221,12 +271,35 @@ ExpresionNode *convert_to_tree(Vector *tokens, Evaluator *evaluator) {
 
         ExpresionNode *node = calloc(sizeof(ExpresionNode), 1);
 
+        int name_length = 0;
+        char old_end_char = *token->end_ptr;
+
+        if(token->end_ptr == token->start_ptr) {
+            name_length = 2;
+        } else {
+            *token->end_ptr = '\0';
+            name_length = strlen(token->start_ptr) + 1;
+        }
+
+        char *name = calloc(name_length, sizeof(char));
+        if (token->end_ptr == token->start_ptr) {
+            name[0] = *token->end_ptr;
+        } else {
+            strcpy(name, token->start_ptr);
+            *token->end_ptr = old_end_char;
+        }
+
+
+        node->name = name;
+        node->value = 0;
+        node->type = token->type;
+
         switch (token->type) {
             case TokenTypeNumber:
+                node->value = atof(node->name);
             case TokenTypeVariable:
                 node->is_leaf = true;
                 node->nodes = NULL;
-                node->token = token;
 
                 vector_pushback(node_stack, node);
                 break;
@@ -234,7 +307,7 @@ ExpresionNode *convert_to_tree(Vector *tokens, Evaluator *evaluator) {
             case TokenTypeFunction:
             case TokenTypeOperator:
             case TokenTypeUnaryOperator:
-                int argument_count;
+                int argument_count = 0;
 
                 if (token->type == TokenTypeFunction) {
                     MathFunction *function = evaluator_get_function(
@@ -251,7 +324,6 @@ ExpresionNode *convert_to_tree(Vector *tokens, Evaluator *evaluator) {
                     argument_count = operation->argument_count;
                 }
 
-                node->token = token;
                 node->is_leaf = false;
                 node->nodes = vector_new();
 
