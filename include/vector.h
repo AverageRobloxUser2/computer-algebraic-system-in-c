@@ -13,5 +13,5 @@ void vector_pushback(Vector* vector, void *value_ptr);
 void vector_set(Vector *vector, size_t index, void *value_ptr);
 void vector_free(Vector *vector);
 void *vector_pop(Vector *vector);
-void vector_remove(Vector *vector, size_t index);
+void *vector_remove(Vector *vector, size_t index);
 #endif

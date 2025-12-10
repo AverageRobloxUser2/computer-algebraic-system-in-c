@@ -1,10 +1,12 @@
 #include "simplifier.h"
 #include "tokenizer.h"
 #include "vector.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "evaluator.h"
+#include <limits.h>
 
 void print_tree(ExpresionNode *node, int depth) {
     // starting depth is 1
@@ -52,6 +54,100 @@ void print_tree(ExpresionNode *node, int depth) {
     }
 }
 
+void compact_operators(ExpresionNode *node) {
+    // will compact leafs for operator 
+    if (node->is_leaf) {
+        return;
+    }
+
+    switch (node->token->type) {
+        case TokenTypeOperator:
+            break;
+        default:
+            return;
+    }
+    for (int i = 0;i < node->nodes->length; i++) {
+        compact_operators(vector_get(node->nodes, i));
+    }
+
+    int new_value = INT_MAX;
+    Vector *to_remove = vector_new();
+    for (int i = 1;i < node->nodes->length; i++) {
+        ExpresionNode *child = vector_get(node->nodes, i);
+
+        if (!child->is_leaf) {
+            continue;
+        }
+
+        if (child->token->type == TokenTypeVariable) {
+            continue;
+        }
+
+        double value = strtod(child->token->start_ptr, &child->token->end_ptr);
+
+        int value_rounded = (int) value;
+        if (value - value_rounded != 0) {
+            printf("skipping %lf since its a float %lf\n", value, value - value_rounded);
+            continue;
+        }
+
+        int *to_remove_index = malloc(sizeof(int));
+        *to_remove_index = i;
+        vector_pushback(to_remove, to_remove_index);
+
+        if (new_value == INT_MAX) {
+            new_value = value_rounded;
+            continue;
+        }
+
+
+        switch (*node->token->start_ptr) {
+            case '+':
+                new_value += value_rounded;
+                break;
+            case '-':
+                new_value -= value_rounded;
+                break;
+            case '*':
+            case '/':
+                new_value *= value_rounded;
+                break;
+            default:
+                // if node is not of suported type dont simplify
+                return;
+        }
+    }
+
+    if (to_remove->length == 1){
+        return;
+    }
+
+    for(int i = 0; i < to_remove->length; i++) {
+        int *index = vector_get(to_remove, i);
+        ExpresionNode *child = vector_remove(node->nodes, *index - i);
+
+        free(child);
+
+        printf("removed %d\n", *index);
+        free(index);
+    }
+    vector_free(to_remove);
+    // omg this is so hacky
+    char *content = calloc(sizeof(char), 32);
+    ExpresionNode *new_node = malloc(sizeof(ExpresionNode));
+    sprintf(content, "%d", new_value);
+    new_node->is_leaf = true;
+    new_node->token = malloc(sizeof(LexerToken));
+
+    new_node->token->start_ptr = content;
+    new_node->token->end_ptr = content + strlen(content);
+    new_node->token->type = TokenTypeNumber;
+
+    printf("New node: %p\n", new_node);
+
+
+    vector_pushback(node->nodes, new_node);
+}
 
 void flatten_tree(ExpresionNode *node) {
     if (node->is_leaf) {
@@ -79,7 +175,6 @@ void flatten_tree(ExpresionNode *node) {
         strcpy(child_name, child->token->start_ptr);
         *child->token->end_ptr = old_end_value;
 
-        printf("names %s -> %s\n", node_name, child_name);
         bool nodes_have_the_same_name = strcmp(node_name, child_name) == 0;
         free(child_name);
 
@@ -112,7 +207,6 @@ void flatten_tree(ExpresionNode *node) {
         }
         vector_free(node->nodes);
         node->nodes = child->nodes;
-
         free(child);
     }
 
@@ -134,14 +228,12 @@ ExpresionNode *convert_to_tree(Vector *tokens, Evaluator *evaluator) {
                 node->nodes = NULL;
                 node->token = token;
 
-                printf("yay\n");
                 vector_pushback(node_stack, node);
                 break;
 
             case TokenTypeFunction:
             case TokenTypeOperator:
             case TokenTypeUnaryOperator:
-                printf("nay\n");
                 int argument_count;
 
                 if (token->type == TokenTypeFunction) {

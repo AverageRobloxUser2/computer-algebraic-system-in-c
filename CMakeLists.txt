@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 4.0)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_BUILD_TYPE Debug)
 
 project(
     "reverse_polish_notation"
@@ -26,6 +27,6 @@ target_sources("rpn-testing" PRIVATE "src/parser.c")
 target_sources("rpn-testing" PRIVATE "src/evaluator.c")
 
 
-add_compile_options(-Wall -Wextra -Wpedantic -ggdb -O3)
+add_compile_options(-Wall -Wextra -Wpedantic -ggdb -03)
 
 

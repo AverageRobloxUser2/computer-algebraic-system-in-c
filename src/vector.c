@@ -1,6 +1,7 @@
 #include "vector.h"
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 Vector *vector_new() {
     Vector *vector = (Vector*) malloc(sizeof(Vector));
@@ -48,11 +49,13 @@ void vector_set(Vector *vector, size_t index, void *value_ptr) {
     vector->_values[index] = value_ptr;
 };
 
-void vector_remove(Vector *vector, size_t index) {
-    void **new_values = calloc(sizeof(void*), vector->length-1);
+void *vector_remove(Vector *vector, size_t index) {
+    void **new_values = calloc(vector->length-1, sizeof(void*));
+    void *result;
     int found_count = 0;
     for(int i = 0; i < vector->length; i++) {
         if(i == index) {
+            result = vector_get(vector, i);
             continue;
         }
 
@@ -62,6 +65,9 @@ void vector_remove(Vector *vector, size_t index) {
 
     free(vector->_values);
     vector->_values = new_values;
+    vector->length --;
+
+    return result;
 }
 
 void vector_free(Vector *vector) {

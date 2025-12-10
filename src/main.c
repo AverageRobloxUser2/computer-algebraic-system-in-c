@@ -43,6 +43,9 @@ EvaluationResult calculate_answer(char *user_input) {
     printf("flattening root\n");
     flatten_tree(node);
     print_tree(node, 1);
+    printf("compacting root\n");
+    compact_operators(node);
+    print_tree(node, 1);
     for(int i = 0; i < tokens->length; i++) {
         LexerToken *token = vector_get(tokens, i);
         free(token);
