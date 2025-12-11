@@ -9,43 +9,99 @@
 #include "evaluator.h"
 #include <limits.h>
 
-void print_tree(ExpresionNode *node, int depth) {
-    // starting depth is 1
-    char *indent = calloc(sizeof(char), depth);
-
-    for(int i = 0; i < depth - 1; i++) {
-        indent[i] = '\t';
-    }
-    printf("%s", indent);
-    free(indent);
+char *node_to_string(ExpresionNode *node) {
+    char *result = calloc(100, sizeof(char));
     switch (node->type) {
-        case TokenTypeVariable:
-            printf("variable: %s", node->name);
-            break;
-        case TokenTypeNumber:
-            printf("number: %s", node->name);
-            break;
-        case TokenTypeFunction:
-            printf("function: %s", node->name);
-            break;
-        case TokenTypeOperator:
         case TokenTypeUnaryOperator:
-            printf("operator: %s", node->name);
+            sprintf(result, "unary_%s(", node->name);
+            break;
+
+        case TokenTypeOperator:
+            sprintf(result, "op_%s(", node->name);
+            break;
+
+        case TokenTypeFunction:
+            sprintf(result, "func_%s(", node->name);
+            break;
+
+        case TokenTypeVariable:
+            sprintf(result, "var(\"%s\")", node->name);
             break;
 
         default:
+            sprintf(result, "%s", node->name);
             break;
     }
-    printf("\n");
-
     if (node->is_leaf) {
-        return;
+        return result;
     }
 
-    for(int i = 0;i < node->nodes->length; i++) {
-        ExpresionNode *child_node = vector_get(node->nodes, i);
-        print_tree(child_node, depth + 1);
+    for(int i = 0; i < node->nodes->length; i++) {
+        ExpresionNode *child = vector_get(node->nodes, i);
+        int old_length = strlen(result);
+
+        char *child_string = node_to_string(child);
+        int child_length = strlen(child_string);
+
+        result = reallocarray(
+            result,
+            old_length + child_length + 2,
+            sizeof(char)
+        );
+
+        strcpy(result + old_length, child_string);
+        free(child_string);
+        result[child_length + old_length] = ',';
+        result[child_length + old_length + 1] = '\0';
     }
+
+    int old_length = strlen(result);
+
+    // result = reallocarray(result, old_length + 2, sizeof(char));
+    result[old_length - 1] = ')';
+    result[old_length] = '\0';
+
+    return result;
+}
+
+void print_tree(ExpresionNode *node, int depth) {
+    printf("%s\n", node_to_string(node));
+    // // starting depth is 1
+    // char *indent = calloc(sizeof(char), depth);
+    //
+    // for(int i = 0; i < depth - 1; i++) {
+    //     indent[i] = '\t';
+    // }
+    // printf("%s", indent);
+    // free(indent);
+    // switch (node->type) {
+    //     case TokenTypeVariable:
+    //         printf("variable: %s", node->name);
+    //         break;
+    //     case TokenTypeNumber:
+    //         printf("number: %s", node->name);
+    //         break;
+    //     case TokenTypeFunction:
+    //         printf("function: %s", node->name);
+    //         break;
+    //     case TokenTypeOperator:
+    //     case TokenTypeUnaryOperator:
+    //         printf("operator: %s", node->name);
+    //         break;
+    //
+    //     default:
+    //         break;
+    // }
+    // printf("\n");
+    //
+    // if (node->is_leaf) {
+    //     return;
+    // }
+    //
+    // for(int i = 0;i < node->nodes->length; i++) {
+    //     ExpresionNode *child_node = vector_get(node->nodes, i);
+    //     print_tree(child_node, depth + 1);
+    // }
 }
 
 char *get_node_name_for_number(double number) {
@@ -88,10 +144,14 @@ void compact_add(ExpresionNode *node) {
     }
 
     remove_nodes(node->nodes, to_remove);
+    if (to_remove->length == 0) {
+        vector_free(to_remove);
+        return;
+    }
     vector_free(to_remove);
     ExpresionNode *new_node;
 
-    if (node->nodes->length == 0) {
+    if (node->nodes->length == 0 || to_remove->length == 0) {
         vector_free(node->nodes);
         node->nodes = NULL;
 
