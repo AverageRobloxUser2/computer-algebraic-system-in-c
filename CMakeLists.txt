@@ -18,6 +18,7 @@ target_sources("rpn" PRIVATE "src/vector.c")
 target_sources("rpn" PRIVATE "src/parser.c")
 target_sources("rpn" PRIVATE "src/simplifier.c")
 target_sources("rpn" PRIVATE "src/evaluator.c")
+target_sources("rpn" PRIVATE "src/hash_table.c")
 
 target_link_libraries("rpn-testing" "m")
 target_sources("rpn-testing" PRIVATE "src/tokenizer.c")
@@ -25,6 +26,7 @@ target_sources("rpn-testing" PRIVATE "src/simplifier.c")
 target_sources("rpn-testing" PRIVATE "src/vector.c")
 target_sources("rpn-testing" PRIVATE "src/parser.c")
 target_sources("rpn-testing" PRIVATE "src/evaluator.c")
+target_sources("rpn-testing" PRIVATE "src/hash_table.c")
 
 
 add_compile_options(-Wall -Wextra -Wpedantic -ggdb -03)
