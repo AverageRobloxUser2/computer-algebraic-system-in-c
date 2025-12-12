@@ -51,25 +51,25 @@ char *to_infix(char *input) {
 
 int main() {
 
+
     EquationToInfixTest infixTests[] = {
-        {"3x+4y", "3*x+4*y"},
-        {"5(a+2)", "5*(a+2)"},
-        {"2xy+3z", "2*x*y+3*z"},
-        {"x^2y", "x^2*y"},
-        {"4(3x+2)", "4*(3*x+2)"},
-        {"(x+2)(y+3)", "(x+2)*(y+3)"},
-        {"(x^2-y)(2)", "(x^2-y)*(2)"},
-        {"3x/2y", "3*x/(2*y)"},
-        {"2!2", "2!*2"},
-        {"3+4", "3+4"},
-        {"7-5", "7-5"},
-        {"12/4", "12/(4)"},
-        {"2*3", "2*3"},
-        {"x+y+z", "x+y+z"},
-        {"(x+1)+(y+2)", "(x+1)+(y+2)"},
-        {"0", "0"},
-        {"-5+3", "-5+3"},
-        {NULL, NULL},
+        {"3x+4y", "3*x+4*y"},        // Implicit multiplication with variables
+        {"5(a+2)", "5*(a+2)"},       // Multiplication with parentheses
+        {"2xy+3z", "2*x*y+3*z"},     // Multiple variable multiplication
+        {"x^2y", "x^2*y"},           // Variable exponentiation
+        {"4(3x+2)", "4*(3*x+2)"},    // Coefficient multiplication
+        {"(x+2)(y+3)", "(x+2)*(y+3)"}, // Binomial multiplication
+        {"3x/2y", "3*x/(2*y)"},      // Implicit multiplication in fractions
+        {"2!2", "2!*2"},             // Factorial
+        {"0", "0"},                  // Zero value
+        {"x+y+z", "x+y+z"},          // Multiple variables addition
+        {"3+4", "3+4"},              // Basic addition
+        {"12/4", "12/(4)"},            // Basic division
+        {"(x+1)+(y+2)", "(x+1)+(y+2)"}, // Nested parentheses
+        {"x^3", "x^3"},              // Cubic expression
+        {"1/x+4", "1/(x)+4"},        // Division involving a variable
+        {"-2(x+3)", "-2*(x+3)"},     // Negative multiplied by expression
+        {NULL, NULL},                 // End of test cases
     };
 
     size_t i = 0;

@@ -2,6 +2,7 @@
 #include "lexer.h"
 #include "postfix.h"
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -141,8 +142,8 @@ InfixEquation convert_lexed_to_infix_only_division(LexerResult lexed) {
 
     for(size_t i = 0; i < lexed.token_count; i++) {
         LexerToken token = lexed.tokens[i];
-        if (token.type == TokenTypeOperator && *token.value == '/') {
-            if (!waiting_to_close) {
+        if (token.type == TokenTypeOperator) {
+            if (!waiting_to_close && *token.value == '/') {
                 add_token(
                     &infix_result,
                     new_token(
@@ -159,7 +160,8 @@ InfixEquation convert_lexed_to_infix_only_division(LexerResult lexed) {
                 );
                 waiting_to_close = true;
                 continue;
-            } else {
+            }
+            if (waiting_to_close ) {
                 waiting_to_close = false;
                 add_token(
                     &infix_result,
@@ -193,7 +195,7 @@ InfixEquation convert_lexed_to_infix_only_division(LexerResult lexed) {
     return infix_result;
 }
 
-InfixEquation convert_lexed_to_infix_without_unary(InfixEquation previous_infix) {
+InfixEquation convert_lexed_to_infix_multiplication(InfixEquation previous_infix) {
     InfixEquation infix_result;
 
     infix_result.success = false;
@@ -222,12 +224,72 @@ InfixEquation convert_lexed_to_infix_without_unary(InfixEquation previous_infix)
     return infix_result;
 }
 
+InfixEquation convert_lexed_to_infix_unary(InfixEquation previous_infix) {
+    InfixEquation infix_result;
+
+    infix_result.success = false;
+    infix_result.token_count = 0;
+    infix_result.tokens = NULL;
+
+    bool waiting_for_value = true;
+
+    for(size_t i = 0;i < previous_infix.token_count; i++) {
+        MathEquationToken token = previous_infix.tokens[i];
+
+        if (token.type == MathParenthasisOpenToken && 
+        token.type == MathParenthasisClosedToken ) {
+            add_token(
+                &infix_result,
+                new_token(
+                    token.type,
+                    token.value
+                )
+            );
+            continue;
+        }
+
+        if (is_value_token(token)) {
+            waiting_for_value = false;
+            add_token(
+                &infix_result,
+                new_token(
+                    token.type,
+                    token.value
+                )
+            );
+            continue;
+        }     
+
+        if (waiting_for_value) {
+            add_token(
+                &infix_result,
+                new_token(
+                    MathUnaryOperatorToken,
+                    token.value
+                )
+            );
+        } else {
+            waiting_for_value = true;
+            add_token(
+                &infix_result,
+                new_token(
+                    MathUnaryOperatorToken,
+                    token.value
+                )
+            );
+        }
+    }
+
+    return infix_result;
+}
+
 InfixEquation convert_lexed_to_infix(LexerResult lexed) {
     // adds implicit multiplication, convert to unary operators, etc
     // this will then be used to for converting to postfix 
     bool expecting_value = true;
     InfixEquation only_division = convert_lexed_to_infix_only_division(lexed);
-    InfixEquation without_unary = convert_lexed_to_infix_without_unary(only_division);
+    InfixEquation without_unary = convert_lexed_to_infix_multiplication(only_division);
+    InfixEquation result = convert_lexed_to_infix_unary(without_unary);
 
-    return without_unary;
+    return result;
 }
