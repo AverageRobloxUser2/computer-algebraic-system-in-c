@@ -1,5 +1,4 @@
 #include "simplifier.h"
-#include "hash_table.h"
 #include "tokenizer.h"
 #include "vector.h"
 #include <stdbool.h>
@@ -10,60 +9,6 @@
 #include "evaluator.h"
 #include <limits.h>
 
-char *node_to_string(ExpresionNode *node) {
-    char *result = calloc(100, sizeof(char));
-    switch (node->type) {
-        case TokenTypeUnaryOperator:
-            sprintf(result, "unary_%s(", node->name);
-            break;
-
-        case TokenTypeOperator:
-            sprintf(result, "op_%s(", node->name);
-            break;
-
-        case TokenTypeFunction:
-            sprintf(result, "func_%s(", node->name);
-            break;
-
-        case TokenTypeVariable:
-            sprintf(result, "var(\"%s\")", node->name);
-            break;
-
-        default:
-            sprintf(result, "%s", node->name);
-            break;
-    }
-    if (node->is_leaf) {
-        return result;
-    }
-
-    for(int i = 0; i < node->nodes->length; i++) {
-        ExpresionNode *child = vector_get(node->nodes, i);
-        int old_length = strlen(result);
-
-        char *child_string = node_to_string(child);
-        int child_length = strlen(child_string);
-
-        result = reallocarray(
-            result,
-            old_length + child_length + 2,
-            sizeof(char)
-        );
-
-        strcpy(result + old_length, child_string);
-        free(child_string);
-        result[child_length + old_length] = ',';
-        result[child_length + old_length + 1] = '\0';
-    }
-
-    int old_length = strlen(result);
-
-    // result = reallocarray(result, old_length + 2, sizeof(char));
-    result[old_length - 1] = ')';
-    result[old_length] = '\0';
-
-    return result;
-}
 
 void print_tree(ExpresionNode *node, int depth) {
     printf("%s\n", node_to_string(node));
@@ -113,18 +58,17 @@ char *get_node_name_for_number(double number) {
     return name;
 }
 
-void remove_nodes(Vector *nodes, Vector *to_remove) {
-    // expects that to_remove values are casted into void ptrs
-    // example
-    // int x = 5;
-    // vector_pushback(to_remove, (void*)x)
-    for(int i = 0; i < to_remove->length; i++) {
-        // because we cast the insert into a void* now we cast into int
-        int index = (int)vector_get(to_remove, i);
-        ExpresionNode *removed_node = vector_remove(nodes, index - i);
+void remove_nodes(Vector *node_nodes, Vector *to_remove_indexes) {
+    for(int i = 0; i < to_remove_indexes->length; i++) {
+        int *index_ptr = (int*)vector_get(to_remove_indexes, i);
+        int index = *index_ptr;
+        // subtract i to offset because length changes when we 
+        // remove nodes
+        ExpresionNode *removed_node = vector_remove(node_nodes, index - i);
 
         free(removed_node->name);
         free(removed_node);
+        free(index_ptr);
     }
 }
 
@@ -166,154 +110,8 @@ ExpresionNode *create_new_number_node(double value) {
     return other_node;
 }
 
-void compact_add(ExpresionNode *node) {
-    printf("compacting\n");
-    if (node->is_leaf) {
-        return;
-    }
-
-    HashTable hash_table_counts = new_hash_table();
-    HashTable hash_table_nodes = new_hash_table();
 
 
-    bool has_sum = false;
-    double sum = 0;
-
-    for(int i = 0; i < node->nodes->length; i++) {
-        ExpresionNode *child = vector_get(node->nodes, i);
-
-        if (child->type == TokenTypeNumber) {
-            sum += child->value;
-            has_sum = true;
-            printf("found sum\n");
-            continue;
-        }
-
-        char *child_expression = node_to_string(child);
-        int *previous_value = get_hash_table(&hash_table_counts, child_expression);
-
-        if (previous_value == NULL) {
-            previous_value = malloc(sizeof(int));
-            *previous_value = 0;
-            set_hash_table(&hash_table_counts, child_expression, previous_value);
-            ExpresionNode *previous_node = get_hash_table(&hash_table_nodes, child_expression);
-            free(previous_node);
-        }
-
-        // cuz hash table stores pointers increasing this increases
-        // the value inside of the hash table
-        (*previous_value)++;
-        set_hash_table(&hash_table_nodes, child_expression, child);
-    }
-
-    // remove all children
-    while (node->nodes->length > 0) {
-        vector_pop(node->nodes);
-    }
-
-    for(int i = 0; i < hash_table_counts.current_filled_count; i++) {
-        char *key = hash_table_counts.keys[i];
-        int *count = get_hash_table(&hash_table_counts, key);
-
-        ExpresionNode *original_node = get_hash_table(&hash_table_nodes, key);
-        if(*count == 1) {
-            vector_pushback(node->nodes, original_node);
-            continue;
-        }
-
-        ExpresionNode *multiply_node = create_new_node(TokenTypeOperator, "*");
-        ExpresionNode *other_node = create_new_number_node((double)*count); 
-
-        vector_pushback(multiply_node->nodes, other_node);
-        vector_pushback(multiply_node->nodes, original_node);
-        printf("yay yay ya\n");
-        print_tree(multiply_node, 0);
-        vector_pushback(node->nodes, multiply_node);
-        print_tree(node, 0);
-    }
-
-    if (has_sum) {
-        ExpresionNode *other_node = create_new_number_node(sum);
-        vector_pushback(node->nodes, other_node);
-    }
-}
-
-void compact_sub(ExpresionNode *node) {
-    Vector *to_remove = vector_new();
-    double result = 0;
-    for(int i = 0; i < node->nodes->length; i++) {
-        ExpresionNode *child = vector_get(node->nodes, i);
-
-        if (child->type != TokenTypeNumber) {
-            continue;
-        }
-
-        if(i == 0) {
-            result += child->value;
-        } else {
-            result -= child->value;
-        }
-
-        // very weird hack we cast to void* so we can then uncast to (int) 
-        // because the vector_pushback signature is Vector* and void*
-        vector_pushback(to_remove, (void*)i);
-    }
-    remove_nodes(node->nodes, to_remove);
-    vector_free(to_remove);
-    ExpresionNode *new_node;
-
-    if (node->nodes->length == 0) {
-        vector_free(node->nodes);
-        node->nodes = NULL;
-
-        new_node = node;
-    } else {
-        new_node = calloc(1, sizeof(ExpresionNode));
-        vector_pushback(node->nodes, new_node);
-    }
-
-    new_node->is_leaf = true;
-    new_node->name = get_node_name_for_number(result);
-    new_node->type = TokenTypeNumber;
-    new_node->value = result;
-}
-
-void compact_multiply(ExpresionNode *node) {
-    Vector *to_remove = vector_new();
-    double result = 1;
-    for(int i = 0; i < node->nodes->length; i++) {
-        ExpresionNode *child = vector_get(node->nodes, i);
-
-        if (child->type != TokenTypeNumber) {
-            continue;
-        }
-
-        result *= child->value;
-
-        // very weird hack we cast to void* so we can then uncast to (int) 
-        // because the vector_pushback signature is Vector* and void*
-        vector_pushback(to_remove, (void*)i);
-    }
-
-    remove_nodes(node->nodes, to_remove);
-    vector_free(to_remove);
-    ExpresionNode *new_node;
-
-    if (node->nodes->length == 0) {
-        vector_free(node->nodes);
-        node->nodes = NULL;
-
-        new_node = node;
-    } else {
-        new_node = calloc(1, sizeof(ExpresionNode));
-        vector_pushback(node->nodes, new_node);
-    }
-
-    new_node->is_leaf = true;
-    new_node->name = get_node_name_for_number(result);
-    new_node->type = TokenTypeNumber;
-    new_node->value = result;
-}
 
 void compact_operators(ExpresionNode *node) {
     if (node->is_leaf) {
@@ -394,7 +192,7 @@ void flatten_tree(ExpresionNode *node) {
     }
 }
 
-ExpresionNode *convert_to_tree(Vector *tokens, Evaluator *evaluator) {
+ExpresionNode *convert_rpn_tokens_to_tree(Vector *tokens, Evaluator *evaluator) {
     Vector *node_stack = vector_new();
 
     for(int i = 0; i < tokens->length; i++) {

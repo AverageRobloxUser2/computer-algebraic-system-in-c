@@ -1,7 +1,6 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <unistd.h>
 #include "evaluator.h"
 #include "tokenizer.h"
@@ -56,7 +55,7 @@ int main() {
         {"2 + 3", 2 + 3}, // Addition
         {"5 - 2", 5 - 2}, // Subtraction
         {"4 * 3", 4 * 3}, // Multiplication
-        {"8 / 2", 8 / 2}, // Division
+        {"8 / 2", 8 / 2.0}, // Division
         {"2 ^ 3", pow(2, 3)}, // Exponentiation
 
         // Unary operations

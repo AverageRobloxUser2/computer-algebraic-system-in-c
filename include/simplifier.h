@@ -21,12 +21,22 @@ typedef struct {
 
 
 
-ExpresionNode *convert_to_tree(Vector *tokens, Evaluator *evaluator);
+ExpresionNode *convert_rpn_tokens_to_tree(Vector *tokens, Evaluator *evaluator);
+
+ExpresionNode *create_new_node(enum LexerTokenType, char *name);
+ExpresionNode *create_new_number_node(double value);
 
 void *simplify_tree(ExpresionNode *node);
 void flatten_tree(ExpresionNode *node);
 void compact_operators(ExpresionNode *node);
 
+void remove_nodes(Vector *node_nodes, Vector *to_remove_indexes);
+
+char *node_to_string(ExpresionNode *node);
 void print_tree(ExpresionNode *node, int depth);
+
+void compact_add(ExpresionNode *node);
+void compact_sub(ExpresionNode *node);
+void compact_multiply(ExpresionNode *node);
 
 #endif

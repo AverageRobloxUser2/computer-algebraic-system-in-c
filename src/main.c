@@ -38,7 +38,7 @@ EvaluationResult calculate_answer(char *user_input) {
 
     result = evaluate(&evaluator, rpn_tokens);
 
-    ExpresionNode *node = convert_to_tree(rpn_tokens, &evaluator);
+    ExpresionNode *node = convert_rpn_tokens_to_tree(rpn_tokens, &evaluator);
     print_tree(node, 1);
     printf("flattening root\n");
     flatten_tree(node);

@@ -94,3 +94,11 @@ void *vector_pop(Vector *vector) {
 
     return last_value;
 }
+
+void vector_swap(Vector *vector, size_t i, size_t j) {
+    void *i_value = vector_get(vector, i);
+    void *j_value = vector_get(vector, j);
+
+    vector_set(vector, i, j_value);
+    vector_set(vector, j, i_value);
+}
