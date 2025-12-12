@@ -1,5 +1,6 @@
 #include "infix.h"
 #include "lexer.h"
+#include "math_equation.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -40,6 +41,7 @@ void do_implicit_multiplication_checks(
         return;
     }
     if (previous_token.type != MathOperatorToken && 
+            previous_token.type != MathParenthasisOpenToken &&
             token.type == MathParenthasisOpenToken) {
 
         add_token(
