@@ -107,6 +107,27 @@ LexerToken handle_parenthasis(char **current_ptr_ptr) {
 
 }
 
+LexerToken handle_variable(char **current_ptr_ptr) {
+    char *current_ptr = *current_ptr_ptr;
+    char *start_ptr = current_ptr;
+
+    // if variable does not start with _ we count it as a short variable
+    // short variables = (x, y, z, etc..., single letter)
+    // long _variable_1, _var_2 etc multi letter
+    if (*start_ptr != '_') {
+        (*current_ptr_ptr)++;
+        return create_lexer_token(TokenTypeVariable, start_ptr, start_ptr+1);
+    }
+
+    while (check_is_variable_or_function(*current_ptr)) {
+        current_ptr++;
+    }
+
+    *current_ptr_ptr = current_ptr;
+
+    return create_lexer_token(TokenTypeVariable, start_ptr, current_ptr);
+}
+
 LexerToken handle_variable_or_function(char **current_ptr_ptr) {
     char *current_ptr = *current_ptr_ptr;
 
@@ -125,7 +146,8 @@ LexerToken handle_variable_or_function(char **current_ptr_ptr) {
     if (is_function) {
         return create_lexer_token(TokenTypeFunction, start_ptr, current_ptr);
     }
-    return create_lexer_token(TokenTypeVariable, start_ptr, current_ptr);
+    *current_ptr_ptr = start_ptr;
+    return handle_variable(current_ptr_ptr); 
 }
 
 LexerResult lex(char *input) {

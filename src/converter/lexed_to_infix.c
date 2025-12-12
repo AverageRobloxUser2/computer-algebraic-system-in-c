@@ -1,0 +1,233 @@
+#include "infix.h"
+#include "lexer.h"
+#include "postfix.h"
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+MathEquationTokenType convert_type(enum LexerTokenType type) {
+    switch (type) {
+        case TokenTypeOperator:
+            return MathOperatorToken;
+
+        case TokenTypeNumber:
+            return MathNumberToken;
+
+        case TokenTypeVariable:
+            return MathVariableToken;
+
+        case TokenTypeFunction:
+            return MathFunctionToken;
+
+        case TokenTypeParenthesisOpen:
+            return MathParenthasisOpenToken;
+
+        case TokenTypeParenthesisClosed:
+            return MathParenthasisClosedToken;
+
+        default:
+            return MathWrongToken;
+    }
+}
+
+MathEquationToken new_token(MathEquationTokenType type, char *value) {
+    MathEquationToken token;
+
+    token.type = type;
+    token.value = calloc(strlen(value) + 1, sizeof(char));
+
+    strcpy(token.value, value);
+
+    return token;
+}
+
+void add_token(MathEquation *equation, MathEquationToken token) {
+    equation->token_count++;
+    equation->tokens = reallocarray(
+        equation->tokens,
+        equation->token_count,
+        sizeof(MathEquationToken)
+    );
+    equation->tokens[equation->token_count-1] = token;
+}
+
+bool is_value_token(MathEquationToken token) {
+    return token.type == MathNumberToken || token.type == MathVariableToken;
+}
+
+void do_implicit_multiplication_checks(
+    InfixEquation *result_infix,
+    InfixEquation previous_infix,
+    size_t i
+) {
+    MathEquationToken token = previous_infix.tokens[i];
+    if(i == 0) {
+        // if we at the first token just add it breh
+        // this case trigged for equations such as
+        // "sin(x)", "(2+1)*2"
+        // but not triggered for
+        // "2+2"
+        return;
+    }
+
+    MathEquationToken previous_token = previous_infix.tokens[i-1];
+
+    if (previous_token.type == MathParenthasisClosedToken &&
+            token.type != MathOperatorToken) {
+        // triggers for cases like this.
+        // ...)2 or ...)sin(2) or ...)(... but not for ...)+x
+        add_token(
+            result_infix,
+            new_token(
+                MathOperatorToken,
+                "*"
+            )
+        );
+
+        return;
+    }
+    if (previous_token.type != MathOperatorToken && 
+            token.type == MathParenthasisOpenToken) {
+
+        add_token(
+            result_infix,
+            new_token(
+                MathOperatorToken,
+                "*"
+            )
+        );
+
+        return;
+    }
+
+    if (previous_token.type == MathOperatorToken && 
+        token.type != MathOperatorToken &&
+        *previous_token.value == '!'
+        ) {
+        // triggers for cases like 5!2
+        // which should result in 5! * 2
+        add_token(
+            result_infix,
+            new_token(
+                MathOperatorToken,
+                "*"
+            )
+        );
+
+        return;
+    }
+
+    if (is_value_token(previous_token) && is_value_token(token)) {
+        add_token(
+            result_infix,
+            new_token(
+                MathOperatorToken,
+                "*"
+            )
+        );
+    }
+}
+
+InfixEquation convert_lexed_to_infix_only_division(LexerResult lexed) {
+    InfixEquation infix_result;
+
+    infix_result.success = false;
+    infix_result.token_count = 0;
+    infix_result.tokens = NULL;
+
+    bool waiting_to_close = false;
+
+    for(size_t i = 0; i < lexed.token_count; i++) {
+        LexerToken token = lexed.tokens[i];
+        if (token.type == TokenTypeOperator && *token.value == '/') {
+            if (!waiting_to_close) {
+                add_token(
+                    &infix_result,
+                    new_token(
+                        convert_type(token.type),
+                        token.value
+                    )
+                );
+                add_token(
+                    &infix_result,
+                    new_token(
+                        MathParenthasisOpenToken,
+                        "("
+                    )
+                );
+                waiting_to_close = true;
+                continue;
+            } else {
+                waiting_to_close = false;
+                add_token(
+                    &infix_result,
+                    new_token(
+                        MathParenthasisClosedToken,
+                        ")"
+                    )
+                );
+            }
+        }
+        
+        add_token(
+            &infix_result,
+            new_token(
+                convert_type(token.type),
+                token.value
+            )
+        );
+    }
+
+    if (waiting_to_close) {
+        add_token(
+            &infix_result,
+            new_token(
+                MathParenthasisClosedToken,
+                ")"
+            )
+        );
+    }
+
+    return infix_result;
+}
+
+InfixEquation convert_lexed_to_infix_without_unary(InfixEquation previous_infix) {
+    InfixEquation infix_result;
+
+    infix_result.success = false;
+    infix_result.token_count = 0;
+    infix_result.tokens = NULL;
+
+    for(size_t i = 0; i < previous_infix.token_count; i++) {
+        MathEquationToken token = previous_infix.tokens[i];
+        bool is_value = is_value_token(token);
+
+        do_implicit_multiplication_checks(
+            &infix_result,
+            previous_infix,
+            i
+        );
+
+        add_token(
+            &infix_result,
+            new_token(
+                token.type,
+                token.value
+            )
+        );
+    }
+
+    return infix_result;
+}
+
+InfixEquation convert_lexed_to_infix(LexerResult lexed) {
+    // adds implicit multiplication, convert to unary operators, etc
+    // this will then be used to for converting to postfix 
+    bool expecting_value = true;
+    InfixEquation only_division = convert_lexed_to_infix_only_division(lexed);
+    InfixEquation without_unary = convert_lexed_to_infix_without_unary(only_division);
+
+    return without_unary;
+}

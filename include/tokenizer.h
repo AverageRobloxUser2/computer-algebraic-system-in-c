@@ -1,19 +1,27 @@
 #ifndef TOKENIZER_H
 #define TOKENIZER_H
 
+#include <stddef.h>
 enum LexerTokenType {
     TokenTypeOperator,
     TokenTypeUnaryOperator,
     TokenTypeNumber,
-    TokenTypeParenthesis,
+    TokenTypeParenthesisOpen,
+    TokenTypeParenthesisClosed,
     TokenTypeVariable,
     TokenTypeFunction,
 };
 
 typedef struct {
     enum LexerTokenType type;
-    char *start_ptr;
-    char *end_ptr;
+    char *value;
 } LexerToken;
+
+typedef struct {
+    LexerToken *tokens;
+    size_t token_count;
+} LexerResult;
+
+LexerResult lex(char *input);
 
 #endif
