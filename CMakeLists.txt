@@ -18,10 +18,17 @@ add_library(
     "src/converter/lexed_to_infix.c"
 )
 
+add_library(
+    "math_equation"
+    "src/math_equation/math_equation.c"
+)
+
 target_link_libraries("rpn" "converter_to_rpn")
+target_link_libraries("rpn" "math_equation")
 target_link_libraries("rpn" "m")
 
 target_link_libraries("test_infix" "converter_to_rpn")
+target_link_libraries("test_infix" "math_equation")
 target_link_libraries("test_infix" "m")
 
 

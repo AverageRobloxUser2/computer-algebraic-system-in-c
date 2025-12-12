@@ -106,6 +106,6 @@ int main() {
 
     printf("-------------\n");
     printf("STATS:\n");
-    printf("\tpassed: %ld\n", passed_count);
-    printf("\tfailed: %ld\n", failed);
+    printf("passed: %ld\n", passed_count);
+    printf("failed: %ld\n", failed);
 }

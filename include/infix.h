@@ -1,7 +1,7 @@
 #ifndef INFIX_H
 #define INFIX_H
 #include "lexer.h"
-#include "postfix.h"
+#include "math_equation.h"
 
 typedef MathEquation InfixEquation;
 
