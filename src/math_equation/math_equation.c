@@ -1,4 +1,5 @@
 #include "math_equation.h"
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -50,4 +51,12 @@ void add_token(MathEquation *equation, MathEquationToken token) {
 
 bool is_value_token(MathEquationToken token) {
     return token.type == MathNumberToken || token.type == MathVariableToken;
+}
+
+void free_equation(MathEquation equation) {
+    for(size_t i = 0;i < equation.token_count; i++) {
+        MathEquationToken token = equation.tokens[i];
+        free(token.value);
+    }
+    free(equation.tokens);
 }

@@ -35,6 +35,8 @@ MathEquationTokenType convert_type(enum LexerTokenType type);
 MathEquationToken new_token(MathEquationTokenType type, char *value);
 void add_token(MathEquation *equation, MathEquationToken token);
 
+
 bool is_value_token(MathEquationToken token);
+void free_equation(MathEquation equation);
 
 #endif

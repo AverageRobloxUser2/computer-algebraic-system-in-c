@@ -1,6 +1,7 @@
 #include "postfix.h"
 #include "infix.h"
 #include "lexer.h"
+#include "math_equation.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -45,8 +46,10 @@ char *to_postfix(char *input) {
 
         strcpy(result + result_length, value);
         result_length = strlen(result);
-        free(value);
     }
+
+    free_equation(infix);
+    free_equation(postfix);
 
     return result;
 }

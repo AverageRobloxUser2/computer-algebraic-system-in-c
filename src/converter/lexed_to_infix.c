@@ -260,7 +260,9 @@ InfixEquation convert_lexed_to_infix(LexerResult lexed) {
     bool expecting_value = true;
     InfixEquation only_division = convert_lexed_to_infix_only_division(lexed);
     InfixEquation without_unary = convert_lexed_to_infix_multiplication(only_division);
+    free_equation(only_division);
     InfixEquation result = convert_lexed_to_infix_unary(without_unary);
+    free_equation(without_unary);
 
     return result;
 }
