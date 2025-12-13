@@ -14,9 +14,9 @@
 typedef struct {
     char *input;
     char *output;
-} EquationToInfixTest;
+} EquationToPostfixTest;
 
-char *to_infix(char *input) {
+char *to_postfix(char *input) {
     char *input_cloned = calloc(strlen(input) + 1, sizeof(char));
     strcpy(input_cloned, input);
 
@@ -54,9 +54,25 @@ char *to_infix(char *input) {
 int main() {
 
 
-    EquationToInfixTest infixTests[] = {
-        {"x+y", "xy+"},
+    EquationToPostfixTest postfix_tests[] = {
+        {"3x+4y", "3x*4y*+"},
+        {"5(a+2)", "5a2+*"},
+        {"2xy+3z", "2x*y*3z*+"},
+        {"x^2y", "x2^y*"},
+        {"4(3x+2)", "43x*2+*"},
+        {"(x+2)(y+3)", "x2+y3+*"},
+        {"3x/2y", "3x*2y*/"},
+        {"2!2", "2!2*"},
+        {"0", "0"},
         {"x+y+z", "xy+z+"},
+        {"3+4", "34+"},
+        {"12/4", "124/"},
+        {"(x+1)+(y+2)", "x1+y2++"},
+        {"x^3", "x3^"},
+        {"1/x+4", "1x/4+"},
+        {"-2(x+3)", "2x3+*-"},
+        {"(-2)(x+3)", "2-x3+*"},
+        {"-2/(xy+3)", "2xy*3+/-"},
         {NULL, NULL},
     };
 
@@ -64,11 +80,11 @@ int main() {
     size_t passed_count = 0;
     size_t failed = 0;
     while(true) {
-        EquationToInfixTest test = infixTests[i];
+        EquationToPostfixTest test = postfix_tests[i];
         if(test.input == NULL) {
             break;
         }
-        char *got_output = to_infix(test.input);
+        char *got_output = to_postfix(test.input);
         char *expected_output = test.output;
         bool passed = strcmp(got_output, expected_output) == 0;
         if (passed) {

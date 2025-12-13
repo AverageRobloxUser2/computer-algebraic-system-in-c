@@ -1,10 +1,14 @@
 #include "math_equation.h"
 #include "postfix.h"
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 bool is_left_associative(char operator) {
     if (operator == '^') {
+        return false;
+    }
+    if (operator == '!') {
         return false;
     }
 
@@ -13,6 +17,8 @@ bool is_left_associative(char operator) {
 
 size_t get_precedence_for_operator(char operator) {
     switch (operator) {
+        case '!':
+            return 4;
         case '^':
             return 4;
 
@@ -36,6 +42,7 @@ PostfixEquation convert_infix_to_postfix(InfixEquation equation) {
 
     MathEquationToken *operator_stack = NULL;
     size_t operator_stack_count = 0;
+
 
     for(size_t i = 0; i < equation.token_count; i++) {
         MathEquationToken token = equation.tokens[i];
@@ -76,8 +83,8 @@ PostfixEquation convert_infix_to_postfix(InfixEquation equation) {
             }
 
             if (!is_left_associative(*token.value) &&
-                    current_precedence == previous_precedence
-                    ){
+                current_precedence == previous_precedence
+            ){
                 goto append_to_operator_stack;
             }
 
@@ -127,30 +134,38 @@ PostfixEquation convert_infix_to_postfix(InfixEquation equation) {
             operator_stack[operator_stack_count] = token;
             operator_stack_count++;
         } else if (token.type == MathParenthasisClosedToken) {
-            int j = operator_stack_count-1;
             while (true) {
-                if(j < 0) {
+                if (operator_stack_count == 0) {
                     break;
                 }
 
-                MathEquationToken previous_token = operator_stack[j];
+                operator_stack_count--;
+                MathEquationToken last_token = operator_stack[operator_stack_count];
+                operator_stack = reallocarray(
+                    operator_stack,
+                    operator_stack_count,
+                    sizeof(MathEquationToken)
+                );
 
-                if (previous_token.type == MathParenthasisOpenToken) {
+
+                if (last_token.type == MathParenthasisOpenToken) {
                     break;
                 }
 
                 add_token(
                     &result,
                     new_token(
-                        previous_token.type, previous_token.value
+                        last_token.type, last_token.value
                     )
                 );
+
             }
         }
     }
 
+
     while (operator_stack_count > 0) {
-        MathEquationToken previous_token = operator_stack[operator_stack_count-1];
+        MathEquationToken last_token = operator_stack[operator_stack_count-1];
         operator_stack = reallocarray(
             operator_stack,
             operator_stack_count-1,
@@ -161,8 +176,8 @@ PostfixEquation convert_infix_to_postfix(InfixEquation equation) {
         add_token(
             &result,
             new_token(
-                previous_token.type,
-                previous_token.value
+                last_token.type,
+                last_token.value
             )
         );
     }

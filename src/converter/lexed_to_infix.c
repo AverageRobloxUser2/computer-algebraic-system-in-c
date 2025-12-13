@@ -210,26 +210,45 @@ InfixEquation convert_lexed_to_infix_unary(InfixEquation previous_infix) {
                 )
             );
             continue;
-        }     
-
-        if (waiting_for_value) {
-            add_token(
-                &infix_result,
-                new_token(
-                    MathUnaryOperatorToken,
-                    token.value
-                )
-            );
-        } else {
+        } else if (
+                token.type == MathOperatorToken ||
+                token.type == MathFunctionToken
+            ){
             waiting_for_value = true;
-            add_token(
-                &infix_result,
-                new_token(
-                    MathUnaryOperatorToken,
-                    token.value
-                )
-            );
         }
+
+        if (token.type == TokenTypeOperator) {
+            if (waiting_for_value) {
+                waiting_for_value = false;
+                add_token(
+                    &infix_result,
+                    new_token(
+                        MathUnaryOperatorToken,
+                        token.value
+                    )
+                );
+            } else {
+                waiting_for_value = true;
+                add_token(
+                    &infix_result,
+                    new_token(
+                        MathUnaryOperatorToken,
+                        token.value
+                    )
+                );
+            }
+            continue;
+        }
+
+
+        add_token(
+            &infix_result,
+            new_token(
+                token.type,
+                token.value
+            )
+        );
+
     }
 
     return infix_result;

@@ -32,6 +32,8 @@ char *to_infix(char *input) {
     char *result = NULL;
     int result_length = 0;
 
+
+
     for(size_t i = 0; i < infix.token_count; i++) {
         char *value = infix.tokens[i].value;
 
@@ -52,7 +54,7 @@ char *to_infix(char *input) {
 int main() {
 
 
-    EquationToInfixTest infixTests[] = {
+    EquationToInfixTest infix_tests[] = {
         {"3x+4y", "3*x+4*y"},
         {"5(a+2)", "5*(a+2)"},
         {"2xy+3z", "2*x*y+3*z"},
@@ -64,11 +66,12 @@ int main() {
         {"0", "0"},
         {"x+y+z", "x+y+z"},
         {"3+4", "3+4"},
-        {"12/4", "12/(4)"},
+        {"1/4", "1/(4)"},
         {"(x+1)+(y+2)", "(x+1)+(y+2)"},
         {"x^3", "x^3"},
         {"1/x+4", "1/(x)+4"},
         {"-2(x+3)", "-2*(x+3)"},
+        {"(-2)(x+3)", "(-2)*(x+3)"},
         {"-2/(xy+3)", "-2/((x*y)+3)"},
         {NULL, NULL},
     };
@@ -77,7 +80,7 @@ int main() {
     size_t passed_count = 0;
     size_t failed = 0;
     while(true) {
-        EquationToInfixTest test = infixTests[i];
+        EquationToInfixTest test = infix_tests[i];
         if(test.input == NULL) {
             break;
         }

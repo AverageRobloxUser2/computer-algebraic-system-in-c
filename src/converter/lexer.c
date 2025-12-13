@@ -196,6 +196,13 @@ LexerResult lex(char *input) {
             continue;
         }
 
+        bool is_parenthasis = check_is_parenthasis(*current_ptr);
+        if (is_parenthasis) {
+            token = handle_parenthasis(&current_ptr);
+            add_token = true;
+            continue;
+        }
+
         bool is_operator = check_is_operator(*current_ptr);
         if (is_operator) {
             token = handle_operator(&current_ptr);
@@ -211,12 +218,6 @@ LexerResult lex(char *input) {
             continue;
         }
 
-        bool is_parenthasis = check_is_parenthasis(*current_ptr);
-        if (is_parenthasis) {
-            token = handle_parenthasis(&current_ptr);
-            add_token = true;
-            continue;
-        }
 
         printf("Failed on %s", current_ptr);
 
