@@ -42,6 +42,7 @@ void do_implicit_multiplication_checks(
     }
     if (previous_token.type != MathOperatorToken && 
             previous_token.type != MathParenthasisOpenToken &&
+            previous_token.type != MathFunctionToken && 
             token.type == MathParenthasisOpenToken) {
 
         add_token(

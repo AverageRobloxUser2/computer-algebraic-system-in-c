@@ -1,5 +1,8 @@
 #include "infix.h"
 #include "lexer.h"
+#include "math_equation.h"
+#include "postfix.h"
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -16,13 +19,19 @@ int main() {
 
     LexerResult lexer_result = lex(user_input);
     InfixEquation infix = convert_lexed_to_infix(lexer_result);
+    PostfixEquation postfix = convert_infix_to_postfix(infix);
     free(user_input);
+    free_equation(infix);
+    for(size_t i = 0; i < lexer_result.token_count; i++) {
+        free(lexer_result.tokens[i].value);
+    }
     free(lexer_result.tokens);
 
-    for(int i = 0; i < infix.token_count; i++) {
-        printf("%s", infix.tokens[i].value);
+    for(int i = 0; i < postfix.token_count; i++) {
+        printf("%s", postfix.tokens[i].value);
     }
     printf("\n");
+    free_equation(postfix);
 
     clock_t ending_clocks = clock();
     clock_t delta_clocks = ending_clocks - starting_clocks;
