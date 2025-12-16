@@ -227,3 +227,12 @@ LexerResult lex(char *input) {
     lexer_result.success = true;
     return lexer_result;
 }
+
+void free_lexed(LexerResult result) {
+    for(size_t i = 0; i < result.token_count; i++) {
+        LexerToken token = result.tokens[i];
+        free(token.value);
+    }
+
+    free(result.tokens);
+}

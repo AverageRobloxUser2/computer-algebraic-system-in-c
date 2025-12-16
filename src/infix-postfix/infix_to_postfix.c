@@ -4,35 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-bool is_left_associative(char operator) {
-    if (operator == '^') {
-        return false;
-    }
-    if (operator == '!') {
-        return false;
-    }
-
-    return true;
-}
-
-size_t get_precedence_for_operator(char operator) {
-    switch (operator) {
-        case '!':
-            return 4;
-        case '^':
-            return 4;
-
-        case '*':
-        case '/':
-            return 3;
-
-        case '+':
-        case '-':
-            return 2;
-        default:
-            return 1;
-    }
-}
 
 PostfixEquation convert_infix_to_postfix(InfixEquation equation) {
     PostfixEquation result;

@@ -15,9 +15,9 @@ add_executable("test_postfix" "src/tests/postfix.c")
 
 add_library(
     "converter_to_rpn"
-    "src/converter/lexer.c"
-    "src/converter/lexed_to_infix.c"
-    "src/converter/infix_to_postfix.c"
+    "src/infix-postfix/lexer.c"
+    "src/infix-postfix/lexed_to_infix.c"
+    "src/infix-postfix/infix_to_postfix.c"
 )
 
 add_library(
@@ -25,18 +25,35 @@ add_library(
     "src/math_equation/math_equation.c"
 )
 
-target_link_libraries("rpn" "converter_to_rpn")
-target_link_libraries("rpn" "math_equation")
+add_library(
+    "ast_tree"
+    "src/ast_tree/postfix_to_ast_tree.c"
+)
+
+target_link_libraries(
+    "rpn"
+    "converter_to_rpn"
+    "math_equation"
+    "ast_tree"
+)
+
 target_link_libraries("rpn" "m")
 
-target_link_libraries("test_infix" "converter_to_rpn")
-target_link_libraries("test_infix" "math_equation")
-target_link_libraries("test_infix" "m")
 
-target_link_libraries("test_postfix" "converter_to_rpn")
-target_link_libraries("test_postfix" "math_equation")
-target_link_libraries("test_postfix" "m")
 
+target_link_libraries(
+    "test_infix"
+    "converter_to_rpn"
+    "math_equation"
+    "ast_tree"
+)
+
+target_link_libraries(
+    "test_postfix"
+    "converter_to_rpn"
+    "math_equation"
+    "ast_tree"
+)
 
 
 add_compile_options(-Wall -Wextra -Wpedantic -ggdb -03)

@@ -1,3 +1,4 @@
+#include "ast_tree.h"
 #include "infix.h"
 #include "lexer.h"
 #include "math_equation.h"
@@ -18,20 +19,25 @@ int main() {
 
 
     LexerResult lexer_result = lex(user_input);
-    InfixEquation infix = convert_lexed_to_infix(lexer_result);
-    PostfixEquation postfix = convert_infix_to_postfix(infix);
     free(user_input);
+
+    InfixEquation infix = convert_lexed_to_infix(lexer_result);
+    free_lexed(lexer_result);
+
+    PostfixEquation postfix = convert_infix_to_postfix(infix);
     free_equation(infix);
-    for(size_t i = 0; i < lexer_result.token_count; i++) {
-        free(lexer_result.tokens[i].value);
-    }
-    free(lexer_result.tokens);
 
     for(int i = 0; i < postfix.token_count; i++) {
         printf("%s", postfix.tokens[i].value);
     }
+
     printf("\n");
+
+    AstNode *node = postfix_to_ast(postfix);
     free_equation(postfix);
+
+    print_ast_tree_as_graphviz(node);
+    free_ast(node);
 
     clock_t ending_clocks = clock();
     clock_t delta_clocks = ending_clocks - starting_clocks;

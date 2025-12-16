@@ -5,6 +5,7 @@
 #include "lexer.h"
 #include <stdbool.h>
 #include <stddef.h>
+
 typedef enum {
     MathUnaryOperatorToken,
     MathOperatorToken,
@@ -37,6 +38,13 @@ void add_token(MathEquation *equation, MathEquationToken token);
 
 
 bool is_value_token(MathEquationToken token);
+bool is_left_associative(char operator);
+
+size_t get_precedence_for_operator(char operator);
+size_t get_argument_count_for_token(
+        MathEquationToken token
+);
+
 void free_equation(MathEquation equation);
 
 #endif

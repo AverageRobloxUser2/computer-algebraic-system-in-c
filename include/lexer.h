@@ -28,4 +28,6 @@ typedef struct {
 
 LexerResult lex(char *input);
 
+void free_lexed(LexerResult result);
+
 #endif
