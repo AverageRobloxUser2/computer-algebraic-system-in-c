@@ -55,10 +55,9 @@ char *to_postfix(char *input) {
 }
 
 int main() {
-
-
     EquationToPostfixTest postfix_tests[] = {
         {"3x+4y", "3x*4y*+"},
+        {"--a", "a--"},
         {"5(a+2)", "5a2+*"},
         {"2xy+3z", "2x*y*3z*+"},
         {"x^2y", "x2^y*"},

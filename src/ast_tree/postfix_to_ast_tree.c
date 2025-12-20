@@ -45,8 +45,8 @@ void handle_functional_token(
     }
 
     AstNode *node = create_new_node(
-            token.type,
-            token.value
+        token.type,
+        token.value
     );
 
     size_t argument_count = get_argument_count_for_token(token);
@@ -57,7 +57,8 @@ void handle_functional_token(
             token.value,
             token.type
         );
-        return;
+        printf("Expected argument count (%ld) found (%ld)\n", argument_count, *node_count_ptr);
+        exit(1);
     }
 
     for(size_t i = 0;i < argument_count; i++) {

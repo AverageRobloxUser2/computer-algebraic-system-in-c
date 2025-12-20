@@ -1,3 +1,4 @@
+#include "ast_tree.h"
 #include "math_equation.h"
 #include "postfix.h"
 #include <stddef.h>
@@ -38,8 +39,7 @@ PostfixEquation convert_infix_to_postfix(InfixEquation equation) {
                 goto pop_from_operator_stack_and_append_to_result;
             }
 
-            if (previous_token.type != MathOperatorToken &&
-                previous_token.type != MathUnaryOperatorToken) {
+            if (previous_token.type != MathOperatorToken) {
 
                 goto append_to_operator_stack;
             }
@@ -58,7 +58,6 @@ PostfixEquation convert_infix_to_postfix(InfixEquation equation) {
             ){
                 goto append_to_operator_stack;
             }
-
             pop_from_operator_stack_and_append_to_result:
                 operator_stack = reallocarray(
                     operator_stack,
@@ -74,6 +73,7 @@ PostfixEquation convert_infix_to_postfix(InfixEquation equation) {
                         previous_token.value
                     )
                 );
+                goto append_to_operator_stack;
 
             append_to_operator_stack:
                 operator_stack = reallocarray(

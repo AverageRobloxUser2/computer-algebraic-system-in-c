@@ -1,10 +1,14 @@
 #include "ast_tree.h"
+#include "math_equation.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 bool simplify_node(AstNode *node) {
+    if (node->type == MathUnaryOperatorToken) {
+        return false;
+    }
     AstNode *child = NULL;
     size_t i;
     for(i = 0; i < node->child_count; i++){

@@ -211,9 +211,8 @@ InfixEquation convert_lexed_to_infix_unary(InfixEquation previous_infix) {
                 )
             );
             continue;
-        } else {
+        } else if (token.type == MathOperatorToken) {
             if (waiting_for_value) {
-                waiting_for_value = false;
                 add_token(
                     &infix_result,
                     new_token(
@@ -234,10 +233,6 @@ InfixEquation convert_lexed_to_infix_unary(InfixEquation previous_infix) {
             }
             continue;
         }
-
-        if (token.type == MathOperatorToken) {
-        }
-
 
         add_token(
             &infix_result,
