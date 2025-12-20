@@ -112,7 +112,6 @@ int main() {
         i++;
     }
 
-    printf("-------------\n");
     printf("STATS:\n");
     printf("passed: %ld\n", passed_count);
     printf("failed: %ld\n", failed);
