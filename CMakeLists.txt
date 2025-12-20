@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 4.0)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+set(CMAKE_C_STANDARD 23)
 set(CMAKE_BUILD_TYPE Debug)
+add_compile_options(-Wall -Wextra -Wpedantic -ggdb -O3)
+
 
 project(
     "reverse_polish_notation"
@@ -27,7 +30,10 @@ add_library(
 
 add_library(
     "ast_tree"
+    "src/ast_tree/ast_tree.c"
+    "src/ast_tree/printing.c"
     "src/ast_tree/postfix_to_ast_tree.c"
+    "src/ast_tree/simplify/concat_operators.c"
 )
 
 target_link_libraries(
@@ -55,7 +61,5 @@ target_link_libraries(
     "ast_tree"
 )
 
-
-add_compile_options(-Wall -Wextra -Wpedantic -ggdb -03)
 
 

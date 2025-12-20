@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+
 enum LexerTokenType {
     TokenTypeOperator,
     TokenTypeFunction,

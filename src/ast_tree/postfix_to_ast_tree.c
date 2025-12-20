@@ -1,45 +1,11 @@
 #include "ast_tree.h"
 #include "math_equation.h"
 #include <stddef.h>
-#include <string.h>
 #include <strings.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-AstNode *create_new_node(
-    MathEquationTokenType type,
-    char *name) {
 
-    AstNode *node = malloc(sizeof(AstNode));
-
-    node->type = type;
-    char *new_name = calloc(strlen(name) + 1, sizeof(char));
-    strcpy(new_name, name);
-
-    node->name = new_name;
-
-    if (type == MathNumberToken) {
-        node->value = atof(name);
-    } else {
-        node->value = 0;
-    }
-
-    node->children_ptrs = NULL;
-    node->child_count = 0;
-
-    return node;
-}
-
-void append_child_node(AstNode *parent, AstNode *child) {
-    parent->child_count ++;
-    parent->children_ptrs = reallocarray(
-        parent->children_ptrs,
-        parent->child_count,
-        sizeof(AstNode*)
-    );
-
-    parent->children_ptrs[parent->child_count-1] = child;
-}
 
 AstNode *pop_node_from_stack(AstNode ***node_stack_ptr, size_t *node_count_ptr) {
 
@@ -86,7 +52,11 @@ void handle_functional_token(
     size_t argument_count = get_argument_count_for_token(token);
 
     if (argument_count > *node_count_ptr) {
-        printf("Not enough variables in stack for this\n");
+        printf(
+            "Not enough variables in stack for this token: \"%s\" -> %d\n", 
+            token.value,
+            token.type
+        );
         return;
     }
 
@@ -142,39 +112,4 @@ AstNode *postfix_to_ast(PostfixEquation postfix) {
     return result;
 }
 
-void ast_print_define_labels(AstNode *node) {
-    printf("ptr_%p[label=\"%s\"];\n", node, node->name);
 
-    for (size_t i = 0; i < node->child_count; i++) {
-        AstNode *child = node->children_ptrs[node->child_count-i-1];
-        ast_print_define_labels(child);
-    }
-}
-
-void ast_print_define_edges(AstNode *node) {
-    for (size_t i = 0; i < node->child_count; i++) {
-        AstNode *child = node->children_ptrs[node->child_count-i-1];
-        printf("ptr_%p -> ptr_%p;\n", node, child);
-
-        ast_print_define_edges(child);
-    }
-}
-
-void print_ast_tree_as_graphviz(AstNode *node) {
-    printf("digraph ast_tree {\n");
-    ast_print_define_labels(node);
-    printf("\n\n");
-    ast_print_define_edges(node);
-    printf("}\n");
-}
-
-void free_ast(AstNode *node) {
-    for (size_t i = 0; i < node->child_count; i++) {
-        AstNode *child = node->children_ptrs[i];
-        free_ast(child);
-    }
-
-    free(node->name);
-    free(node->children_ptrs);
-    free(node);
-}

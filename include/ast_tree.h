@@ -15,9 +15,19 @@ struct AstNode_S {
     char *name;
 };
 
+
+AstNode *create_new_node(
+    MathEquationTokenType type,
+    char *name);
 void append_child_node(AstNode *parent, AstNode *node);
 AstNode *postfix_to_ast(PostfixEquation postfix);
 void free_ast(AstNode *);
 void print_ast_tree_as_graphviz(AstNode *node);
+
+char *ast_node_to_string(AstNode* node);
+
+// simplifying
+
+bool ast_node_concat_operators(AstNode *node); 
 
 #endif

@@ -189,7 +189,7 @@ InfixEquation convert_lexed_to_infix_unary(InfixEquation previous_infix) {
     for(size_t i = 0;i < previous_infix.token_count; i++) {
         MathEquationToken token = previous_infix.tokens[i];
 
-        if (token.type == MathParenthasisOpenToken && 
+        if (token.type == MathParenthasisOpenToken || 
         token.type == MathParenthasisClosedToken ) {
             add_token(
                 &infix_result,
@@ -211,14 +211,7 @@ InfixEquation convert_lexed_to_infix_unary(InfixEquation previous_infix) {
                 )
             );
             continue;
-        } else if (
-                token.type == MathOperatorToken ||
-                token.type == MathFunctionToken
-            ){
-            waiting_for_value = true;
-        }
-
-        if (token.type == TokenTypeOperator) {
+        } else {
             if (waiting_for_value) {
                 waiting_for_value = false;
                 add_token(
@@ -228,17 +221,21 @@ InfixEquation convert_lexed_to_infix_unary(InfixEquation previous_infix) {
                         token.value
                     )
                 );
+                continue;
             } else {
                 waiting_for_value = true;
                 add_token(
                     &infix_result,
                     new_token(
-                        MathUnaryOperatorToken,
+                        MathOperatorToken,
                         token.value
                     )
                 );
             }
             continue;
+        }
+
+        if (token.type == MathOperatorToken) {
         }
 
 
