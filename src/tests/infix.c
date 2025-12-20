@@ -414,10 +414,6 @@ EquationToInfixTest infix_tests[] = {
         }
         InfixEquation infix = to_infix(test.input);
         if (passed_string_test(infix, test) && passed_type_test(infix, test)) {
-            printf(
-                ANSI_COLOR_GREEN "%s\n" ANSI_COLOR_RESET,
-                test.input
-            );
             passed_count++;
         } else {
             printf(

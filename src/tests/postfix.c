@@ -96,11 +96,6 @@ int main() {
         char *expected_output = test.output;
         bool passed = strcmp(got_output, expected_output) == 0;
         if (passed) {
-            printf(
-                ANSI_COLOR_GREEN "%s -> %s\n" ANSI_COLOR_RESET,
-                test.input,
-                got_output
-            );
             passed_count++;
         } else {
             printf(
