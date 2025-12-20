@@ -109,6 +109,17 @@ EquationToInfixTest infix_tests[] = {
         },
     },
     {
+        "a--b",
+        "a--b",
+        {
+            MathVariableToken,
+            MathOperatorToken,
+            MathUnaryOperatorToken,
+            MathVariableToken,
+            MathWrongToken,
+        },
+    },
+    {
         "5(a+2)",
         "5*(a+2)",
         {

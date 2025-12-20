@@ -55,9 +55,11 @@ char *ast_node_to_string(AstNode *node) {
     char *result = calloc(100, sizeof(char));
     switch (node->type) {
         case MathFunctionToken:
-        case MathUnaryOperatorToken:
         case MathOperatorToken:
             sprintf(result, "%s(", node->name);
+            break;
+        case MathUnaryOperatorToken:
+            sprintf(result, "u_%s(", node->name);
             break;
         case MathVariableToken:
         case MathNumberToken:

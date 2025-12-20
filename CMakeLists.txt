@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 4.0)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_PARALLEL_LEVEL 16)
 add_compile_options(-Wall -Wextra -Wpedantic -ggdb -O3)
 
 

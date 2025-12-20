@@ -53,11 +53,16 @@ PostfixEquation convert_infix_to_postfix(InfixEquation equation) {
                 goto append_to_operator_stack;
             }
 
-            if (!is_left_associative(*token.value) &&
+            bool thing = !is_left_associative(*token.value);
+            if (token.type == MathUnaryOperatorToken) {
+                thing = true;
+            }
+            if (thing &&
                 current_precedence == previous_precedence
             ){
                 goto append_to_operator_stack;
             }
+
             pop_from_operator_stack_and_append_to_result:
                 operator_stack = reallocarray(
                     operator_stack,
