@@ -223,6 +223,9 @@ InfixEquation convert_lexed_to_infix_unary(InfixEquation previous_infix) {
                 continue;
             } else {
                 waiting_for_value = true;
+                if (*token.value == '!') {
+                    waiting_for_value = false;
+                }
                 add_token(
                     &infix_result,
                     new_token(
@@ -252,10 +255,10 @@ InfixEquation convert_lexed_to_infix(LexerResult lexed) {
     // this will then be used to for converting to postfix 
     bool expecting_value = true;
     InfixEquation only_division = convert_lexed_to_infix_only_division(lexed);
-    InfixEquation without_unary = convert_lexed_to_infix_multiplication(only_division);
+    InfixEquation with_implicit = convert_lexed_to_infix_multiplication(only_division);
     free_equation(only_division);
-    InfixEquation result = convert_lexed_to_infix_unary(without_unary);
-    free_equation(without_unary);
+    InfixEquation result = convert_lexed_to_infix_unary(with_implicit);
+    free_equation(with_implicit);
 
     return result;
 }

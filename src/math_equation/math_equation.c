@@ -94,6 +94,9 @@ void free_equation(MathEquation equation) {
 size_t get_argument_count_for_token(MathEquationToken token) {
     switch (token.type) {
         case MathOperatorToken:
+            if (*token.value == '!') {
+                return 1;
+            }
             return 2;
         case MathUnaryOperatorToken:
         case MathFunctionToken:
