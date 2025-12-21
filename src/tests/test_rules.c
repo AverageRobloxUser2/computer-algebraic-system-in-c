@@ -5,16 +5,32 @@
 #include "ast_tree.h"
 #include "rules.h"
 
+void print_variables(MathVariableMap *map) {
+    for(size_t i = 0; i < map->variable_count; i++) {
+        printf(
+            "%s -> %s\n",
+            map->_variable_names[i],
+            map->_variable_value_strings[i]
+        );
+    }
+}
+
 int main() {
     // Define simplification rules
     MathSimplificationRule rules[] = {
-        {"ab+cb", "b*(a+c)"}, {"--a", "a"},
+        {"ab+cb", "b*(a+c)"}, 
+        {"ab+bc", "b*(a+c)"}, 
+        {"ba+bc", "b*(a+c)"}, 
+        {"--a", "a"},
         {"1*a", "a"},
+        {"a/1", "a"},
+        {"a/a", "1"},
+        {"a*b/a", "b"},
         {NULL, NULL} // End of rules
     };
 
     // Example equation to simplify
-    char *equation = "a*b*c+b*d*e";
+    char *equation = "(x+4)(x-3) + (x-3)(x+7)";
     AstNode *node = string_to_ast_node(equation);
     ast_node_concat_operators(node);
 
@@ -33,11 +49,12 @@ int main() {
         // Print results of rule application
         printf("%s -> %d\n", rule.left, rules_match);
         if (rules_match) {
-            printf("var_count: %ld\n", map->variable_count);
+            printf("variable count: %d\n", map->variable_count);
+            print_variables(map);
             AstNode *applied_rule = create_node_form_rules(left_node, map);
             printf("RESULT: ");
             print_ast_as_string(applied_rule);
-            free_ast(applied_rule);
+            // free_ast(applied_rule);
         }
 
         // Clean up

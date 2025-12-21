@@ -67,7 +67,6 @@ char *ast_node_to_string(AstNode *node) {
             sprintf(result, "%s", node->name);
             return result;
         default:
-
             printf("Invalid node type (%d) encountered\n", node->type);
             exit(1);
     }

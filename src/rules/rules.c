@@ -1,5 +1,6 @@
 #include "rules.h"
 #include "ast_tree.h"
+#include "lexer.h"
 #include "math_equation.h"
 #include <stdbool.h>
 #include <stddef.h>
@@ -39,7 +40,6 @@ AstNode *mutate_node(
     size_t child_i
 ) {
     MathOrderOfEquation order = get_order(node);
-    printf("SELECTED ORDER: %d\n", order);
     AstNode *new_node = create_new_node(node->type, node->name);
     if (node->child_count <= 2) {
         for(size_t i = 0; i < node->child_count; i++) {
@@ -115,9 +115,6 @@ MathVariableMap *compare_node_with_rule(
         AstNode *starting_rule,
         size_t depth
 ) {
-    print_depth(depth);
-    printf("STARTIG AT:");
-    print_ast_as_string(starting_node);
     MathVariableMap *map = create_variable_map(
         starting_node, 
         starting_rule
@@ -177,8 +174,6 @@ MathVariableMap *compare_node_with_rule(
 
 MathVariableMap *does_node_match_rule(AstNode *node, AstNode *rule_node) {
 
-    print_ast_as_string(node);
-    print_ast_as_string(rule_node);
     if (node->type != rule_node->type) {
         printf("nodes not equal based on node type\n");
         return NULL;
@@ -202,6 +197,12 @@ AstNode *create_node_form_rules(AstNode *rule, MathVariableMap *map) {
         rule->type,
         rule->name
     );
+
+    if (rule->type == MathVariableToken) {
+        free_ast(result);
+        result = variable_map_get_variable_value(map, rule->name);
+        return result;
+    }
 
     for(size_t i = 0; i < rule->child_count; i++){
         AstNode *child_rule = rule->children_ptrs[i];

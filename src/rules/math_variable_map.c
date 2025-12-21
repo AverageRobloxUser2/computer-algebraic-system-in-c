@@ -30,8 +30,6 @@ bool math_variable_map_match_variable(MathVariableMap *map, size_t index, AstNod
 
     char *old_value = map->_variable_value_strings[index];
     bool matches = strcmp(string_value, old_value) == 0;
-    printf("comparing \"%s\" and \"%s\"\n", string_value, old_value);
-    printf("result %d\n", matches);
 
     free(string_value);
 
@@ -62,27 +60,18 @@ void math_variable_map_insert(MathVariableMap *map, char *name, AstNode *node) {
     map->_variable_value_strings[last] = ast_node_to_string(node);
     map->_variable_values[last] = node;
     map->_variable_names[last] = name;
-    printf("INSERT %s AS ", name);
-    print_ast_as_string(node);
 }
 
 bool populate_variable_map(MathVariableMap *map, AstNode *node, AstNode *rule) {
     if (node->child_count != rule->child_count) {
-        printf("child count not equal %ld!=%ld\n", node->child_count, rule->child_count);
-        printf("node: ");
-        print_ast_as_string(node);
-        printf("rule: ");
-        print_ast_as_string(rule);
         return false;
     }
 
     if (node->type != rule->type) {
-        printf("types not equal %d!=%d\n", node->type, rule->type);
         return false;
     }
 
     if (strcmp(node->name, rule->name)) {
-        printf("names not equal %s and %s\n", node->name, rule->name);
         return false;
     }
 
@@ -115,15 +104,9 @@ bool populate_variable_map(MathVariableMap *map, AstNode *node, AstNode *rule) {
 
             // we already have registered this node in the map, so we skip
             if (variable_in_map_same_as_this_one) {
-                printf("variable %s already registered\n", rule_child->name);
                 continue;
             }
 
-            printf("we found a variable that should be of the same value\n");
-            printf("node: ");
-            print_ast_as_string(child);
-            printf("rule: ");
-            print_ast_as_string(rule_child);
             // we found a variable that should be of the same value but is not
             // for example rule (a-a) and node is (c-b)
             // this will get called on b since the map contains
@@ -176,7 +159,6 @@ MathVariableMap *create_variable_map(AstNode *node, AstNode *rule) {
         return NULL;
     };
 
-    printf("map var count: %ld\n", map->variable_count);
 
     return map;
 }
@@ -185,12 +167,12 @@ MathVariableMap *create_variable_map(AstNode *node, AstNode *rule) {
 AstNode *variable_map_get_variable_value(MathVariableMap *map, char *name) {
     int index = math_variable_map_get_name_index(map, name);
     if (index == -1) {
+        printf("NOTHING FOUND\n", name);
         return NULL;
     }
 
     AstNode *response = map->_variable_values[index];
-    printf("GETTING VALUE %s\n", name);
-    printf("value -> ");
+    printf("GOT THIS SHIT FOR NAME %s: ", name);
     print_ast_as_string(response);
 
     return response;
