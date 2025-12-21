@@ -39,12 +39,12 @@ bool simplify_node(AstNode *node) {
     size_t node_child_ptrs_length_before = i * sizeof(AstNode*);
     size_t node_child_ptrs_length_after = (node->child_count - i - 1) * sizeof(AstNode*);
 
-    printf(
-        "lenghts: %ld %ld %ld\n",
-        node_child_ptrs_length_before,
-        child_node_child_ptrs_length,
-        node_child_ptrs_length_after
-    );
+    // printf(
+    //     "lenghts: %ld %ld %ld\n",
+    //     node_child_ptrs_length_before,
+    //     child_node_child_ptrs_length,
+    //     node_child_ptrs_length_after
+    // );
 
     memcpy(
         new_child_ptrs,

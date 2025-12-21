@@ -20,9 +20,15 @@ AstNode *create_new_node(
     MathEquationTokenType type,
     char *name);
 void append_child_node(AstNode *parent, AstNode *node);
+
 AstNode *postfix_to_ast(PostfixEquation postfix);
+AstNode *string_to_ast_node(char *input);
+
 void free_ast(AstNode *);
+
 void print_ast_tree_as_graphviz(AstNode *node);
+void print_ast_as_string(AstNode *node);
+
 
 char *ast_node_to_string(AstNode* node);
 

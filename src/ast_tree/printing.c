@@ -1,5 +1,6 @@
 #include "ast_tree.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 void ast_print_define_labels(AstNode *node) {
     printf("\tptr_%p[label=\"%s\"];\n", (void*)node, node->name);
@@ -25,4 +26,10 @@ void print_ast_tree_as_graphviz(AstNode *node) {
     printf("\n\n");
     ast_print_define_edges(node);
     printf("}\n");
+}
+
+void print_ast_as_string(AstNode *node) {
+    char *as_string = ast_node_to_string(node);
+    printf("%s\n", as_string);
+    free(as_string);
 }

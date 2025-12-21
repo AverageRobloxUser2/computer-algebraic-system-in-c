@@ -16,21 +16,20 @@ include_directories("include")
 add_executable("rpn" "src/main.c")
 add_executable("test_infix" "src/tests/infix.c")
 add_executable("test_postfix" "src/tests/postfix.c")
+add_executable("test_rules" "src/tests/test_rules.c")
 
 add_library(
-    "converter_to_rpn"
+    "cas"
+
     "src/infix-postfix/lexer.c"
     "src/infix-postfix/lexed_to_infix.c"
     "src/infix-postfix/infix_to_postfix.c"
-)
+    
+    "src/rules/rules.c"
+    "src/rules/math_variable_map.c"
 
-add_library(
-    "math_equation"
     "src/math_equation/math_equation.c"
-)
 
-add_library(
-    "ast_tree"
     "src/ast_tree/ast_tree.c"
     "src/ast_tree/printing.c"
     "src/ast_tree/postfix_to_ast_tree.c"
@@ -39,28 +38,23 @@ add_library(
 
 target_link_libraries(
     "rpn"
-    "converter_to_rpn"
-    "math_equation"
-    "ast_tree"
+    cas
 )
 
-target_link_libraries("rpn" "m")
-
-
-
+#
 target_link_libraries(
     "test_infix"
-    "converter_to_rpn"
-    "math_equation"
-    "ast_tree"
+    cas
+)
+#
+target_link_libraries(
+    "test_postfix"
+    cas
 )
 
 target_link_libraries(
-    "test_postfix"
-    "converter_to_rpn"
-    "math_equation"
-    "ast_tree"
+    "test_rules"
+    cas
 )
-
 
 

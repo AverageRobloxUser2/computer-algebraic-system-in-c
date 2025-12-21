@@ -1,9 +1,8 @@
-#include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
 #include "ast_tree.h"
+#include "lexer.h"
+#include <time.h>
+#include <stdlib.h>
 
 int main() {
     clock_t starting_clocks = clock();
@@ -39,11 +38,22 @@ int main() {
     printf("node as string: %s\n", node_after_concating);
     free(node_before_concating);
     free(node_after_concating);
+    printf("GRAPHVIZ\n");
+    print_ast_tree_as_graphviz(node);
     free_ast(node);
 
     clock_t ending_clocks = clock();
     clock_t delta_clocks = ending_clocks - starting_clocks;
+    AstNode *result = string_to_ast_node("a+b+c");
+    print_ast_tree_as_graphviz(result);
+    ast_node_concat_operators(result);
+    node_after_concating = ast_node_to_string(result);
+    printf("result as string: %s\n", node_after_concating);
+    free_ast(result);
+    free(node_after_concating);
+
     printf("Done in: %lf\n", (double)delta_clocks / CLOCKS_PER_SEC);
 
     return 0;
 }
+

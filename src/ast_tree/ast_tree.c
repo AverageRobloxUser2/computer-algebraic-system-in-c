@@ -1,4 +1,5 @@
 #include "ast_tree.h"
+#include "lexer.h"
 #include "math_equation.h"
 #include "stdlib.h"
 #include <stddef.h>
@@ -66,7 +67,8 @@ char *ast_node_to_string(AstNode *node) {
             sprintf(result, "%s", node->name);
             return result;
         default:
-            printf("Invalid node type encountered\n");
+
+            printf("Invalid node type (%d) encountered\n", node->type);
             exit(1);
     }
     size_t result_length = strlen(result);
@@ -93,3 +95,25 @@ char *ast_node_to_string(AstNode *node) {
 
     return result;
 }
+
+AstNode *string_to_ast_node(char *input) {
+    char *writable_input = calloc(strlen(input) + 1, sizeof(char));
+    strcpy(writable_input, input);
+
+    LexerResult lexer_result = lex(writable_input);
+    free(writable_input);
+
+    InfixEquation infix = convert_lexed_to_infix(lexer_result);
+    free_lexed(lexer_result);
+
+    PostfixEquation postfix = convert_infix_to_postfix(infix);
+    free_equation(infix);
+
+    AstNode *node = postfix_to_ast(postfix);
+    free_equation(postfix);
+
+    ast_node_concat_operators(node);
+
+    return node;
+}
+
