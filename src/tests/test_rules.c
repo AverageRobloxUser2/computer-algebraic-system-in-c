@@ -31,8 +31,11 @@ int main() {
 
     // Example equation to simplify
     char *equation = "(x+4)(x-3) + (x-3)(x+7)";
+    // equation = "4*3/4";
     AstNode *node = string_to_ast_node(equation);
     ast_node_concat_operators(node);
+
+    print_ast_tree_as_graphviz(node);
 
     // Iterate through the defined rules and apply them
     for (size_t i = 0; rules[i].left != NULL; i++) {
@@ -52,8 +55,12 @@ int main() {
             printf("variable count: %d\n", map->variable_count);
             print_variables(map);
             AstNode *applied_rule = create_node_form_rules(left_node, map);
+            ast_node_concat_operators(applied_rule);
             printf("RESULT: ");
-            print_ast_as_string(applied_rule);
+            print_ast_tree_as_graphviz(applied_rule);
+            free(applied_rule->children_ptrs);
+            free(applied_rule->name);
+            free(applied_rule);
             // free_ast(applied_rule);
         }
 
