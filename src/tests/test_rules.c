@@ -26,24 +26,27 @@ int main() {
         {"a/1", "a"},
         {"a/a", "1"},
         {"a*b/a", "b"},
+        {"a/b*c/a", "c/b"},
+        {"a-a", "0"},
+        {"a-a+c", "c"},
+        {"a+c-a", "c"},
         {NULL, NULL} // End of rules
     };
 
     // Example equation to simplify
-    char *equation = "(x+4)(x-3) + (x-3)(x+7)";
+    char *user_input = NULL;
+    size_t line_length = 0;
+    getline(&user_input, &line_length, stdin);
+    // char *equation = "(x+4)(x-3) + (x-3)(x+7)";
+    char *equation = user_input;
     // equation = "4*3/4";
-    AstNode *node = string_to_ast_node(equation);
-    ast_node_concat_operators(node);
-
-    print_ast_tree_as_graphviz(node);
-
     // Iterate through the defined rules and apply them
     for (size_t i = 0; rules[i].left != NULL; i++) {
+        AstNode *node = string_to_ast_node(equation);
         MathSimplificationRule rule = rules[i];
         
         // Create AST nodes for the rule
         AstNode *rule_node = string_to_ast_node(rule.left);
-        AstNode *left_node = string_to_ast_node(rule.right);
         
         // Check if the current equation node matches the rule
         MathVariableMap *map = does_node_match_rule(node, rule_node);
@@ -52,29 +55,33 @@ int main() {
         // Print results of rule application
         printf("%s -> %d\n", rule.left, rules_match);
         if (rules_match) {
+            AstNode *right_node = string_to_ast_node(rule.right);
             printf("variable count: %d\n", map->variable_count);
+
             print_variables(map);
-            AstNode *applied_rule = create_node_form_rules(left_node, map);
+            AstNode *applied_rule = create_node_form_rules(right_node, map);
             ast_node_concat_operators(applied_rule);
-            printf("RESULT: ");
-            print_ast_tree_as_graphviz(applied_rule);
-            free(applied_rule->children_ptrs);
-            free(applied_rule->name);
-            free(applied_rule);
-            // free_ast(applied_rule);
+
+            char *equation = ast_node_to_equation(applied_rule);
+            printf("RESULT: %s\n", equation);
+
+            free(equation);
+
+            free_ast(right_node);
+            free_ast(applied_rule);
         }
 
         // Clean up
         free_ast(rule_node);
-        free_ast(left_node);
+        free_ast(node);
         // Make sure to free the variable map if it was allocated in does_node_match_rule
         if (map != NULL) {
             free_variable_map(map);
+            break;
         }
     }
 
-    // Clean up the original equation AST
-    free_ast(node);
+    free(user_input);
     
     return 0;
 }

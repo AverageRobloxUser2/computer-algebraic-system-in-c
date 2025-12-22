@@ -58,7 +58,7 @@ void math_variable_map_insert(MathVariableMap *map, char *name, AstNode *node) {
 
     size_t last = map->variable_count-1;
     map->_variable_value_strings[last] = ast_node_to_string(node);
-    map->_variable_values[last] = node;
+    map->_variable_values[last] = deep_clone_node(node);
     map->_variable_names[last] = name;
 }
 
@@ -126,7 +126,9 @@ bool populate_variable_map(MathVariableMap *map, AstNode *node, AstNode *rule) {
 void free_variable_map(MathVariableMap *map) {
     for(size_t i = 0; i < map->variable_count; i++) {
         free(map->_variable_value_strings[i]);
+        free_ast(map->_variable_values[i]);
     }
+
     map->variable_count = 0;
     if (map->_variable_value_strings != NULL) {
         free(map->_variable_value_strings);

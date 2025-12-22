@@ -175,17 +175,17 @@ MathVariableMap *compare_node_with_rule(
 MathVariableMap *does_node_match_rule(AstNode *node, AstNode *rule_node) {
 
     if (node->type != rule_node->type) {
-        printf("nodes not equal based on node type\n");
+        // printf("nodes not equal based on node type\n");
         return NULL;
     }
 
     if (strcmp(node->name, rule_node->name) != 0) {
-        printf("nodes not equal based on node names\n");
+        // printf("nodes not equal based on node names\n");
         return NULL;
     }
 
     if (node->child_count < rule_node->child_count) {
-        printf("nodes not equal based on node child_count\n");
+        // printf("nodes not equal based on node child_count\n");
         return NULL;
     }
 
@@ -201,16 +201,18 @@ AstNode *create_node_form_rules(AstNode *rule, MathVariableMap *map) {
     if (rule->type == MathVariableToken) {
         free_ast(result);
         result = variable_map_get_variable_value(map, rule->name);
-        return result;
+        return deep_clone_node(result);
     }
 
     for(size_t i = 0; i < rule->child_count; i++){
         AstNode *child_rule = rule->children_ptrs[i];
         AstNode *to_append = NULL;
         if (child_rule->type == MathVariableToken) {
-            to_append = variable_map_get_variable_value(map, child_rule->name);
+            to_append = deep_clone_node(
+                variable_map_get_variable_value(map, child_rule->name)
+            );
         } else if( child_rule->type == MathNumberToken) {
-            to_append = child_rule;
+            to_append = deep_clone_node(child_rule);
         } else {
             to_append = create_node_form_rules(child_rule, map);
         }

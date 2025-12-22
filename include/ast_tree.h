@@ -19,6 +19,9 @@ struct AstNode_S {
 AstNode *create_new_node(
     MathEquationTokenType type,
     char *name);
+AstNode *deep_clone_node(
+    AstNode *node
+);
 void append_child_node(AstNode *parent, AstNode *node);
 
 AstNode *postfix_to_ast(PostfixEquation postfix);
@@ -31,6 +34,8 @@ void print_ast_as_string(AstNode *node);
 
 
 char *ast_node_to_string(AstNode* node);
+
+char *ast_node_to_equation(AstNode *node);
 
 // simplifying
 
