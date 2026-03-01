@@ -45,6 +45,7 @@ void free_ast(AstNode *node) {
 }
 
 char *ast_node_to_string(AstNode *node) {
+    // i expct we wont encounter a number of lenght 32 chars
     char *result = calloc(32, sizeof(char));
     switch (node->type) {
         case MathFunctionToken:
@@ -64,25 +65,27 @@ char *ast_node_to_string(AstNode *node) {
     }
     size_t result_length = strlen(result);
     result = reallocarray(result, result_length + 1, sizeof(char));
+    result[result_length] = 0;
 
     for(size_t i = 0; i < node->child_count; i++) {
         AstNode *child = node->children_ptrs[i];
 
         char *child_to_string = ast_node_to_string(child);
-        // old length + child_length + , + end
+        //                  previous string + child name            + , + \0
         size_t new_length = result_length + strlen(child_to_string) + 1 + 1;
 
         result = reallocarray(result, new_length, sizeof(char));
         strcpy(result + result_length, child_to_string);
         result[new_length-2] = ',';
 
-        result_length = strlen(result);
+        result_length = new_length - 1; 
         free(child_to_string);
     }
 
     // the last character is always ',', since we append ',' to the result
     // in the for loop
     result[result_length-1] = ')';
+    result[result_length] = 0;
 
     return result;
 }
