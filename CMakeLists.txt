@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 4.0)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(CMAKE_C_STANDARD 23)
-set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_BUILD_PARALLEL_LEVEL 16)
-add_compile_options(-Wall -Wextra -Wpedantic -ggdb -O3)
+add_compile_options(-Wall -Wextra -Wpedantic -O3)
+
+set(CMAKE_BUILD_TYPE Debug)
+add_compile_options(-ggdb)
 
 
 project(
@@ -42,6 +44,7 @@ add_library(
     "src/ast_tree/simplify/multiplication_by_1.c"
     "src/ast_tree/simplify/addition_with_same_multiplicator.c"
     "src/ast_tree/simplify/division_by_1.c"
+    "src/ast_tree/simplify/subtract_into_negated_addition.c"
 )
 
 target_link_libraries(

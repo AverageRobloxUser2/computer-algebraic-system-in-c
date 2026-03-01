@@ -57,6 +57,9 @@ char *ast_node_to_equation(AstNode *node);
 // simplifying
 
 bool ast_node_concat_operators(AstNode *node); 
+bool ast_node_subtraction_into_negated_addition(AstNode *node);
+bool ast_node_division_into_multiplication(AstNode *node);
+
 bool ast_node_simplify_multiplication_convert_to_power(AstNode *node);
 bool ast_node_simplify_addition_convert_to_multiplication(AstNode *node);
 bool ast_node_simplify_same_multiplicator_addition(AstNode *node);

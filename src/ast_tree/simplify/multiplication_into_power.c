@@ -24,6 +24,74 @@ AstNode *create_power_node(AstNode *start_node, size_t succesive_nodes) {
 
     return power_node;
 }
+
+
+void concat_power_nodes(AstNode *parent, AstNode *node) {
+    // we deep clone so when we remove children its not freed
+    node = deep_clone_node(node);
+
+    double number_exponent = 0;
+    AstNode *exponent_holder = create_new_node(MathOperatorToken, "+");
+    for(size_t i = 0; i < parent->child_count; i++) {
+        AstNode *child_node = parent->children_ptrs[i];
+
+        if (ast_node_is_same_node(child_node, node)) {
+            remove_and_free_child_at_index(parent, i);
+            number_exponent++;
+            i--;
+        }
+        // unary operator and inside operator is same node
+        // example node "a" and node "u_-(a)"
+        if (child_node->type == MathOperatorToken) {
+            if (*child_node->name == '^' && ast_node_is_same_node(
+                        child_node->children_ptrs[0],
+                        node
+                )) {
+
+                for(size_t j = 1; j < child_node->child_count; j++) {
+                    append_child_node(
+                        exponent_holder, 
+                        deep_clone_node(child_node->children_ptrs[j])
+                    );
+                }
+
+                remove_and_free_child_at_index(parent, i);
+                i--;
+                continue;
+            }
+        }
+    }
+
+    if (number_exponent == 1 && exponent_holder->child_count == 0) {
+        append_child_node(
+            parent,
+            node
+        );
+        free_ast(exponent_holder);
+        return;
+    } 
+
+    append_child_node(exponent_holder, create_number_node(number_exponent));
+
+    AstNode *power_node = create_new_node(MathOperatorToken, "^");
+    append_child_node(power_node, node);
+
+    if (exponent_holder->child_count == 1) {
+        append_child_node(
+            power_node,
+            create_number_node(number_exponent)
+        );
+        free_ast(exponent_holder);
+    } else {
+        append_child_node(power_node, exponent_holder);
+    }
+
+    append_child_node(
+        parent,
+        power_node
+    );
+}
+
 bool ast_node_simplify_multiplication_convert_to_power(AstNode *node) {
     // algorithm explanation
     // first recursivly simplify all children
@@ -51,51 +119,10 @@ bool ast_node_simplify_multiplication_convert_to_power(AstNode *node) {
         return false;
     }
 
-
-    int succesive_nodes = 1;
-    AstNode *start_node = *node->children_ptrs;
-    
-
-    AstNode **old_children = node->children_ptrs+1;
-    size_t old_child_count = node->child_count-1;
-
-    node->child_count = 0;
-    node->children_ptrs = NULL;
-
-    bool changed = false;
-
-    for(size_t i = 0; i < old_child_count; i++) {
-        AstNode *current_node = old_children[i];
-
-
-        if (!ast_node_is_same_node(start_node, current_node)) {
-            append_child_node(
-                    node,
-                    create_power_node(start_node, succesive_nodes)
-            );
-
-            free_ast(start_node);
-
-
-            if (succesive_nodes > 1) {
-                changed = true;
-            }
-
-            start_node = current_node;
-            succesive_nodes = 1;
-
-            continue;
-        }
-
-        free_ast(current_node);
-
-        succesive_nodes += 1;
+    for(size_t i = 0; i < node->child_count; i++) {
+        AstNode *current_node = node->children_ptrs[0];
+        concat_power_nodes(node, current_node);
     }
-
-    append_child_node(
-        node,
-        create_power_node(start_node, succesive_nodes)
-    );
 
     if (node->child_count == 1) {
         append_child_node(
@@ -104,10 +131,7 @@ bool ast_node_simplify_multiplication_convert_to_power(AstNode *node) {
         );
     }
 
-    free(old_children - 1);
+    ast_node_concat_operators(node);
 
-    free_ast(start_node);
-
-
-    return changed;
+    return true;
 }

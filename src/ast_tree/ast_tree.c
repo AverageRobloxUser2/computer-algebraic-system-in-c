@@ -106,16 +106,21 @@ AstNode *string_to_ast_node(char *input) {
     AstNode *node = postfix_to_ast(postfix);
     free_equation(postfix);
 
+
+    ast_node_subtraction_into_negated_addition(node);
+    ast_node_division_into_multiplication(node);
+
     ast_node_concat_operators(node);
     sort_node(node);
+    print_ast_as_string(node);
+
     ast_node_simplify_addition_convert_to_multiplication(node);
     sort_node(node);
+
     ast_node_simplify_multiplication_convert_to_power(node);
-    sort_node(node);
+
     ast_node_simplify_multipliaction_by_1(node);
-    sort_node(node);
-    ast_node_simplify_division_by_1(node);
-    sort_node(node);
+
     ast_node_simplify_same_multiplicator_addition(node);
     sort_node(node);
 

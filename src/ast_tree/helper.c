@@ -1,4 +1,5 @@
 #include "ast_tree.h"
+#include <math.h>
 #include "math_equation.h"
 #include <stddef.h>
 #include <stdio.h>
@@ -79,10 +80,17 @@ void replace_node_with_another(AstNode *node, AstNode *replacment) {
 
 AstNode *create_number_node(double number) {
     char number_as_string[32];
-    sprintf(number_as_string, "%lf", number);
+    sprintf(number_as_string, "%lf", fabs(number));
     AstNode *new_node = create_new_node(MathNumberToken, number_as_string);
 
-    return new_node;
+    if (number >= 0) {
+        return new_node;
+    }
+
+    AstNode *negate_node = create_new_node(MathUnaryOperatorToken, "-");
+    append_child_node(negate_node, new_node);
+
+    return negate_node;
 }
 
 bool ast_node_is_same_node(AstNode *node_a, AstNode *node_b) {
