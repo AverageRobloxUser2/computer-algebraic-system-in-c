@@ -133,7 +133,6 @@ bool ast_node_simplify_same_multiplicator_addition(AstNode *node) {
         append_child_node(addition_node, addend_clone);
     }
 
-    char *most_common_factor_as_string = NULL;
     AstNode *most_common_factor = NULL;
     size_t most_common_factor_found_count = 0;
 
@@ -141,14 +140,10 @@ bool ast_node_simplify_same_multiplicator_addition(AstNode *node) {
         AstNode *addend_node = addition_node->children_ptrs[i];
         for(size_t j = 0; j < addend_node->child_count; j++) {
             AstNode *factor_node = addend_node->children_ptrs[j];
-            char *factor_as_string = ast_node_to_string(factor_node);
 
             // check if we already processed this factor
-            if (most_common_factor_as_string != NULL) {
-                if (strcmp(factor_as_string, most_common_factor_as_string) == 0) {
-                    free(factor_as_string);
-                    continue;
-                }
+            if (ast_node_is_same_node(factor_node, most_common_factor)) {
+                continue;
             }
 
             size_t factor_appearence_count = count_common_factors(
@@ -158,15 +153,10 @@ bool ast_node_simplify_same_multiplicator_addition(AstNode *node) {
 
             if (factor_appearence_count > most_common_factor_found_count) {
                 most_common_factor_found_count = factor_appearence_count;
-                free(most_common_factor_as_string);
-                most_common_factor_as_string = factor_as_string;
                 most_common_factor = factor_node;
-            } else {
-                free(factor_as_string);
             }
         }
     }
-    free(most_common_factor_as_string);
 
     bool replaced_anything = most_common_factor_found_count > 1;
     if (most_common_factor_found_count > 1) {

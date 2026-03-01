@@ -114,6 +114,8 @@ AstNode *string_to_ast_node(char *input) {
     sort_node(node);
     ast_node_simplify_multipliaction_by_1(node);
     sort_node(node);
+    ast_node_simplify_division_by_1(node);
+    sort_node(node);
     ast_node_simplify_same_multiplicator_addition(node);
     sort_node(node);
 

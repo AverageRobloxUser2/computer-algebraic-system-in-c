@@ -6,20 +6,12 @@
 #include <stdlib.h>
 
 int find_child_index(AstNode *node, AstNode *to_match_node) {
-    char *to_match_str = ast_node_to_string(to_match_node);
-
     for(int i = 0; i < node->child_count; i++) {
         AstNode *child = node->children_ptrs[i];
-        char *child_str = ast_node_to_string(child);
-
-        bool same_node = strcmp(to_match_str, child_str) == 0;
-        free(child_str);
-        if (same_node) {
-            free(to_match_str);
+        if (ast_node_is_same_node(child, to_match_node)) {
             return i;
         }
     }
-    free(to_match_str);
 
     return -1;
 }
@@ -91,4 +83,36 @@ AstNode *create_number_node(double number) {
     AstNode *new_node = create_new_node(MathNumberToken, number_as_string);
 
     return new_node;
+}
+
+bool ast_node_is_same_node(AstNode *node_a, AstNode *node_b) {
+    if (node_a == node_b) {
+        return true;
+    }
+
+    if (node_a == NULL || node_b == NULL) {
+        return false;
+    }
+
+    if (node_a->type != node_b->type) {
+        return false;
+    }
+
+    if (node_a->child_count != node_b->child_count) {
+        return false;
+    }
+
+    if (strcmp(node_a->name, node_b->name)) {
+        return false;
+    }
+
+    for(size_t i = 0; i < node_a->child_count; i++) {
+        AstNode *child_a = node_a->children_ptrs[i];
+        AstNode *child_b = node_b->children_ptrs[i];
+        if (!ast_node_is_same_node(child_a, child_b)) {
+            return false;
+        }
+    }
+
+    return true;
 }

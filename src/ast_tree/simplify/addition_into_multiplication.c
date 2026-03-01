@@ -42,7 +42,6 @@ bool ast_node_simplify_addition_convert_to_multiplication(AstNode *node) {
 
     int succesive_nodes = 1;
     AstNode *start_node = *node->children_ptrs;
-    char *start_str = ast_node_to_string(start_node);
 
 
     // reduce these by 1 since we start already with a start node
@@ -58,17 +57,13 @@ bool ast_node_simplify_addition_convert_to_multiplication(AstNode *node) {
     for(size_t i = 0; i < old_child_count; i++) {
         AstNode *current_node = old_children[i];
 
-        char *current_str = ast_node_to_string(current_node);
 
-        bool same = strcmp(current_str, start_str) == 0;
-
-        if (!same) {
+        if (!ast_node_is_same_node(current_node, start_node)) {
             append_child_node(
                     node,
                     create_multiplication_node(start_node, succesive_nodes)
             );
 
-            free(start_str);
             free_ast(start_node);
 
 
@@ -77,13 +72,11 @@ bool ast_node_simplify_addition_convert_to_multiplication(AstNode *node) {
             }
 
             start_node = current_node;
-            start_str = current_str;
             succesive_nodes = 1;
 
             continue;
         }
 
-        free(current_str);
         free_ast(current_node);
 
         succesive_nodes += 1;
@@ -97,7 +90,6 @@ bool ast_node_simplify_addition_convert_to_multiplication(AstNode *node) {
     // what a fucking annoying bug to find
     free(old_children - 1);
 
-    free(start_str);
     free_ast(start_node);
 
     return changed;
