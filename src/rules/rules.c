@@ -1,6 +1,5 @@
 #include "rules.h"
 #include "ast_tree.h"
-#include "lexer.h"
 #include "math_equation.h"
 #include <stdbool.h>
 #include <stddef.h>
@@ -37,13 +36,20 @@ MathOrderOfEquation get_order(AstNode *node) {
 
 AstNode *mutate_node(
     AstNode *node, 
-    size_t child_i
+    size_t child_i,
+    bool reverse
 ) {
     MathOrderOfEquation order = get_order(node);
     AstNode *new_node = create_new_node(node->type, node->name);
     if (node->child_count <= 2) {
-        for(size_t i = 0; i < node->child_count; i++) {
-            append_child_node(new_node, node->children_ptrs[i]);
+        if (reverse) {
+            for(size_t i = node->child_count; i > 0 ; i--) {
+                append_child_node(new_node, node->children_ptrs[i-1]);
+            }
+        } else {
+            for(size_t i = 0; i < node->child_count; i++) {
+                append_child_node(new_node, node->children_ptrs[i]);
+            }
         }
 
         return new_node;
@@ -53,8 +59,13 @@ AstNode *mutate_node(
 
     if (order == OrderDoesntMatter) {
         AstNode *selected_child = node->children_ptrs[child_i];
-        append_child_node(new_node, selected_child);
-        append_child_node(new_node, child_holder);
+        if (!reverse) {
+            append_child_node(new_node, selected_child);
+            append_child_node(new_node, child_holder);
+        } else {
+            append_child_node(new_node, child_holder);
+            append_child_node(new_node, selected_child);
+        }
         for(size_t i = 0; i < node->child_count; i++) {
             if (i == child_i) {
                 continue;
@@ -63,9 +74,21 @@ AstNode *mutate_node(
             AstNode *child = node->children_ptrs[i];
             append_child_node(child_holder, child);
         }
-    } else if (order == KeepFirst) {
-    }
+    } else {
+        child_i = 0;
+        AstNode *selected_child = node->children_ptrs[child_i];
+        append_child_node(new_node, selected_child);
+        append_child_node(new_node, child_holder);
 
+        for(size_t i = 0; i < node->child_count; i++) {
+            if (i == child_i) {
+                continue;
+            }
+
+            AstNode *child = node->children_ptrs[i];
+            append_child_node(child_holder, child);
+        }
+    }
     return new_node;
 }
 
@@ -141,33 +164,55 @@ MathVariableMap *compare_node_with_rule(
     AstNode** mutable_child_ptr = find_first_mutable_child(&node);
 
     if (mutable_child_ptr == NULL) {
+        printf("no mutable child found\n");
         return NULL;
     }
+
     AstNode *mutable_child = *mutable_child_ptr;
 
-    for(size_t i = 0; i < mutable_child->child_count; i++) {
-        AstNode *mutated_node = mutate_node(mutable_child, i);
-        *mutable_child_ptr = mutated_node;
+    for(size_t j = 0; j < 2; j++) {
+        for(size_t i = 0; i < mutable_child->child_count; i++) {
+            AstNode *mutated_node = mutate_node(mutable_child, i, j==0);
 
-        MathVariableMap *match = compare_node_with_rule(
-                node,
-                rule,
-                starting_node,
-                starting_rule,
-                depth+1
-        );
+            print_depth(depth);
+            print_ast_as_string(mutated_node);
 
-        *mutable_child_ptr = mutable_child;
+            *mutable_child_ptr = mutated_node;
+
+            MathVariableMap *match = NULL;
+            if (starting_node != mutable_child) {
+                match = compare_node_with_rule(
+                    node,
+                    rule,
+                    starting_node,
+                    starting_rule,
+                    depth+1
+                );
+            } else {
+                match = compare_node_with_rule(
+                    mutated_node,
+                    rule,
+                    mutated_node,
+                    starting_rule,
+                    depth
+                );
+            }
+
+            *mutable_child_ptr = mutable_child;
 
 
-        free(mutated_node->name);
-        free(mutated_node->children_ptrs);
-        free(mutated_node);
+            free(mutated_node->name);
+            free(mutated_node->children_ptrs);
+            free(mutated_node);
 
-        if (match != NULL) {
-            return match;
+            if (match != NULL) {
+                return match;
+            }
+
         }
     }
+
+    printf("just invalid\n");
 
     return NULL;
 }

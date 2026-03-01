@@ -30,16 +30,6 @@ AstNode *create_new_node(
     return node;
 }
 
-void append_child_node(AstNode *parent, AstNode *child) {
-    parent->child_count ++;
-    parent->children_ptrs = reallocarray(
-        parent->children_ptrs,
-        parent->child_count,
-        sizeof(AstNode*)
-    );
-
-    parent->children_ptrs[parent->child_count-1] = child;
-}
 
 void free_ast(AstNode *node) {
     for (size_t i = 0; i < node->child_count; i++) {
@@ -55,7 +45,7 @@ void free_ast(AstNode *node) {
 }
 
 char *ast_node_to_string(AstNode *node) {
-    char *result = calloc(100, sizeof(char));
+    char *result = calloc(32, sizeof(char));
     switch (node->type) {
         case MathFunctionToken:
         case MathOperatorToken:
@@ -75,8 +65,8 @@ char *ast_node_to_string(AstNode *node) {
     size_t result_length = strlen(result);
     result = reallocarray(result, result_length + 1, sizeof(char));
 
-    for(size_t i = node->child_count; i > 0; i--) {
-        AstNode *child = node->children_ptrs[i-1];
+    for(size_t i = 0; i < node->child_count; i++) {
+        AstNode *child = node->children_ptrs[i];
 
         char *child_to_string = ast_node_to_string(child);
         // old length + child_length + , + end
@@ -114,6 +104,15 @@ AstNode *string_to_ast_node(char *input) {
     free_equation(postfix);
 
     ast_node_concat_operators(node);
+    sort_node(node);
+    ast_node_simplify_addition_convert_to_multiplication(node);
+    sort_node(node);
+    ast_node_simplify_multiplication_convert_to_power(node);
+    sort_node(node);
+    ast_node_simplify_multipliaction_by_1(node);
+    sort_node(node);
+    ast_node_simplify_same_multiplicator_addition(node);
+    sort_node(node);
 
     return node;
 }
@@ -161,7 +160,6 @@ char *ast_node_to_equation(AstNode *node) {
             break;
         case MathOperatorToken:
         case MathFunctionToken:
-        case MathUnaryOperatorToken:
             append_combination(
                 &combinations,
                 &combination_count,
@@ -194,6 +192,30 @@ char *ast_node_to_equation(AstNode *node) {
                 &combination_count,
                 ")"
             );
+            break;
+        case MathUnaryOperatorToken:
+            append_combination(
+                &combinations,
+                &combination_count,
+               "(" 
+            );
+            append_combination(
+                &combinations,
+                &combination_count,
+                node->name
+            );
+            first_equation = ast_node_to_equation(node->children_ptrs[0]);
+            append_combination(
+                &combinations,
+                &combination_count,
+                first_equation
+            );
+            append_combination(
+                &combinations,
+                &combination_count,
+               ")" 
+            );
+            free(first_equation);
     }
 
     char *result = NULL;

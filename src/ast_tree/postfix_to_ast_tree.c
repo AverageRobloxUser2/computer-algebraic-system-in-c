@@ -70,6 +70,13 @@ void handle_functional_token(
             )
         );
     }
+    
+    for(size_t i = 0;i < node->child_count/2; i++) {
+        size_t other_side_i = node->child_count - i - 1;
+        AstNode *other_side_ptr = node->children_ptrs[other_side_i];
+        node->children_ptrs[other_side_i] = node->children_ptrs[i]; 
+        node->children_ptrs[i] = other_side_ptr; 
+    }
 
     add_node_to_stack(node_stack_ptr, node_count_ptr, node);
 }

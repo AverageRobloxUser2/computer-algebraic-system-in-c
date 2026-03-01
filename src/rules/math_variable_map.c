@@ -149,14 +149,21 @@ void free_variable_map(MathVariableMap *map) {
 
 MathVariableMap *create_variable_map(AstNode *node, AstNode *rule) {
     if (node->child_count != rule->child_count) {
+        printf(
+            "failed creating variable map due to wront child counts %ld and %ld\n",
+            node->child_count,
+            rule->child_count
+        );
         return NULL;
     }
 
     if (node->type != rule->type) {
+        printf("failed creating variable map due to node types\n");
         return NULL;
     }
     MathVariableMap *map = calloc(1, sizeof(MathVariableMap));
     if (!populate_variable_map(map, node, rule)) {
+        printf("failed creating variable map due to failure to populate\n");
         free_variable_map(map);
         return NULL;
     };
@@ -169,13 +176,13 @@ MathVariableMap *create_variable_map(AstNode *node, AstNode *rule) {
 AstNode *variable_map_get_variable_value(MathVariableMap *map, char *name) {
     int index = math_variable_map_get_name_index(map, name);
     if (index == -1) {
-        printf("NOTHING FOUND\n", name);
+        printf("NOTHING FOUND for %s\n", name);
         return NULL;
     }
 
     AstNode *response = map->_variable_values[index];
-    printf("GOT THIS SHIT FOR NAME %s: ", name);
-    print_ast_as_string(response);
+    // printf("GOT THIS SHIT FOR NAME %s: ", name);
+    // print_ast_as_string(response);
 
     return response;
 }

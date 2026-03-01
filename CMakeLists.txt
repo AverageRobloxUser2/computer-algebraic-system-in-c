@@ -17,6 +17,7 @@ add_executable("rpn" "src/main.c")
 add_executable("test_infix" "src/tests/infix.c")
 add_executable("test_postfix" "src/tests/postfix.c")
 add_executable("test_rules" "src/tests/test_rules.c")
+add_executable("test_simplify" "src/tests/simplification.c")
 
 add_library(
     "cas"
@@ -31,9 +32,15 @@ add_library(
     "src/math_equation/math_equation.c"
 
     "src/ast_tree/ast_tree.c"
+    "src/ast_tree/helper.c"
+    "src/ast_tree/sort_node.c"
     "src/ast_tree/printing.c"
     "src/ast_tree/postfix_to_ast_tree.c"
     "src/ast_tree/simplify/concat_operators.c"
+    "src/ast_tree/simplify/multiplication_into_power.c"
+    "src/ast_tree/simplify/addition_into_multiplication.c"
+    "src/ast_tree/simplify/multiplication_by_1.c"
+    "src/ast_tree/simplify/addition_with_same_multiplicator.c"
 )
 
 target_link_libraries(
@@ -54,6 +61,11 @@ target_link_libraries(
 
 target_link_libraries(
     "test_rules"
+    cas
+)
+
+target_link_libraries(
+    "test_simplify"
     cas
 )
 

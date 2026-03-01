@@ -11,7 +11,6 @@ typedef struct {
 typedef struct {
     size_t variable_count;
     AstNode **_variable_values;
-    // ast_node_to_string list
     char **_variable_value_strings;
     char **_variable_names;
 } MathVariableMap;
