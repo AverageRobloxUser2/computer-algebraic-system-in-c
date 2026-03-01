@@ -56,8 +56,10 @@ char *ast_node_to_string(AstNode *node) {
             sprintf(result, "u_%s(", node->name);
             break;
         case MathVariableToken:
-        case MathNumberToken:
             sprintf(result, "%s", node->name);
+            return result;
+        case MathNumberToken:
+            sprintf(result, "%g", node->value);
             return result;
         default:
             printf("Invalid node type (%d) encountered\n", node->type);

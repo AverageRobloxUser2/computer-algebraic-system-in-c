@@ -29,7 +29,7 @@ int main() {
     // do_things("a*a*b*b*a");              // Power reduction
     // do_things("a+b-a-b");                // Total collapse to zero
     // do_things("a*b*0");                  // Zero destruction
-    do_things("a+(b+(c-c)-b)-a");        // Deeply nested cancellation
+    // do_things("a+(b+(c-c)-b)-a");        // Deeply nested cancellation
     // do_things("bad+bad+bad");            // Grouping complex products
                                          //
 

@@ -93,14 +93,6 @@ void concat_power_nodes(AstNode *parent, AstNode *node) {
 }
 
 bool ast_node_simplify_multiplication_convert_to_power(AstNode *node) {
-    // algorithm explanation
-    // first recursivly simplify all children
-    // we have a variable called "succesive_nodes". it stores the amount
-    // of times a node appears in success
-    // for example in equation
-    // "a * a * b"
-    // succesive_nodes for a will be 2, which we will then create
-    // a equation "a^2 * b"
     for(size_t i = 0; i < node->child_count; i++) {
         ast_node_simplify_multiplication_convert_to_power(
             node->children_ptrs[i]

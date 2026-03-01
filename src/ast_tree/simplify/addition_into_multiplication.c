@@ -57,7 +57,6 @@ void concat_similar_nodes(AstNode *parent, AstNode *node) {
         }
     }
 
-    printf("count found: %d\n", (int)count);
     append_child_node(
         parent,
         create_multiplication_node(node, count)
