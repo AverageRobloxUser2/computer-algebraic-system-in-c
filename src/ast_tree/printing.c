@@ -6,14 +6,14 @@ void ast_print_define_labels(AstNode *node) {
     printf("\tptr_%p[label=\"%s\"];\n", (void*)node, node->name);
 
     for (size_t i = 0; i < node->child_count; i++) {
-        AstNode *child = node->children_ptrs[node->child_count-i-1];
+        AstNode *child = node->children_ptrs[i];
         ast_print_define_labels(child);
     }
 }
 
 void ast_print_define_edges(AstNode *node) {
     for (size_t i = 0; i < node->child_count; i++) {
-        AstNode *child = node->children_ptrs[node->child_count-i-1];
+        AstNode *child = node->children_ptrs[i];
         printf("\tptr_%p -> ptr_%p;\n", (void*)node, (void*)child);
 
         ast_print_define_edges(child);

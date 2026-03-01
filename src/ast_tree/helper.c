@@ -80,7 +80,7 @@ void replace_node_with_another(AstNode *node, AstNode *replacment) {
 
 AstNode *create_number_node(double number) {
     char number_as_string[32];
-    sprintf(number_as_string, "%lf", fabs(number));
+    sprintf(number_as_string, "%g", fabs(number));
     AstNode *new_node = create_new_node(MathNumberToken, number_as_string);
 
     if (number >= 0) {

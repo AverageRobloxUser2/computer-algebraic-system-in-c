@@ -109,12 +109,13 @@ AstNode *string_to_ast_node(char *input) {
     free_equation(postfix);
 
 
+
     ast_node_subtraction_into_negated_addition(node);
+    print_ast_tree_as_graphviz(node);
     ast_node_division_into_multiplication(node);
 
     ast_node_concat_operators(node);
     sort_node(node);
-    print_ast_as_string(node);
 
     ast_node_simplify_addition_convert_to_multiplication(node);
     sort_node(node);

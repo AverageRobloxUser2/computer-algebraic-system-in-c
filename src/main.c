@@ -6,9 +6,9 @@
 
 void do_things(char *input) {
     AstNode *node = string_to_ast_node(input);
-    printf("Simplified %s\ninto: ", input);
-    print_ast_as_string(node);
-    printf("------------\n");
+    char *eq = ast_node_to_equation(node);
+    printf("%s\n", eq);
+    free(eq);
     free_ast(node);
 }
 
