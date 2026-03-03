@@ -24,5 +24,5 @@ FOIL would feed into distribute. this would happen before any serious simplifica
 
 
 # fix
-2x - x -> 2x + -x; while 2x + x -> 3x;
+1. 2x - x -> 2x + -x; while 2x + x -> 3x;
 

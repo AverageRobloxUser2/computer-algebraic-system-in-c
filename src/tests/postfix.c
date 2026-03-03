@@ -3,6 +3,7 @@
 #include "lexer.h"
 #include "math_equation.h"
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -18,7 +19,7 @@ char *to_postfix(char *input) {
     PostfixEquation postfix = convert_infix_to_postfix(infix);
 
 
-    for(int i = 0; i < lexer_result.token_count; i++) {
+    for(size_t i = 0; i < lexer_result.token_count; i++) {
         free(lexer_result.tokens[i].value);
     }
     free(lexer_result.tokens);
@@ -81,6 +82,7 @@ int main() {
         {"a^b^c", "abc^^"},
         {"(a^b)^c", "ab^c^"},
         {"a^b", "ab^"},
+        {"-a+a", "a-a+"},
         // just for testing length, sicne i found some mem bugs.
         // {"qwertyuiopasdfghjklzxcvbnm", "qw*e*r*t*y*u*i*o*p*a*s*d*f*g*h*j*k*l*z*x*c*v*b*n*m*"},
         {NULL, NULL},

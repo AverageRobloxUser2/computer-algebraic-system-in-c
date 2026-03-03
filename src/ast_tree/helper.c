@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 int find_child_index(AstNode *node, AstNode *to_match_node) {
-    for(int i = 0; i < node->child_count; i++) {
+    for(size_t i = 0; i < node->child_count; i++) {
         AstNode *child = node->children_ptrs[i];
         if (ast_node_is_same_node(child, to_match_node)) {
             return i;
@@ -35,8 +35,8 @@ void remove_and_free_child_at_index(AstNode *parent, size_t index) {
     }
 
     AstNode **new_children = calloc(
-        sizeof(AstNode*), 
-        parent->child_count-1
+        parent->child_count-1,
+        sizeof(AstNode*)
     );
 
     size_t j = 0;

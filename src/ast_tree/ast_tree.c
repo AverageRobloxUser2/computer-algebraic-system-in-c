@@ -135,9 +135,9 @@ AstNode *string_to_ast_node(char *input) {
     AstNode *node = postfix_to_ast(postfix);
     free_equation(postfix);
 
-    for(size_t i = 0; i < 10; i++) {
+    // for(size_t i = 0; i < 10; i++) {
         simplify_itteration(node);
-    }
+    // }
 
     return node;
 }

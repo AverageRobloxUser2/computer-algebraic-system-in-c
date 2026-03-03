@@ -98,12 +98,14 @@ PostfixEquation convert_infix_to_postfix(InfixEquation equation) {
                 continue;
             }
 
-            if (previous_operator.type != MathOperatorToken) {
+            if (previous_operator.type != MathOperatorToken
+                    && previous_operator.type != MathUnaryOperatorToken) {
                 append_to_operator_stack(
                     &operator_stack,
                     &operator_stack_count,
                     token
                 );
+
                 continue;
             }
 
@@ -143,6 +145,7 @@ PostfixEquation convert_infix_to_postfix(InfixEquation equation) {
                 );
                 size_t last_precedence = get_precedence_for_operator(*last_token.value);
 
+                printf("last %zu, new %zu\n", last_precedence, current_precedence);
                 if (last_precedence >= current_precedence) {
                     append_to_result(&result, last_token);
                     continue;
