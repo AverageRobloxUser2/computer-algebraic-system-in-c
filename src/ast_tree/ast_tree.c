@@ -114,6 +114,10 @@ void simplify_itteration(AstNode *node) {
 
     ast_node_simplify_same_multiplicator_addition(node);
     sort_node(node);
+    ast_node_constant_fold(node);
+    sort_node(node);
+    ast_node_simplify_power_identities(node);
+    sort_node(node);
 }
 
 AstNode *string_to_ast_node(char *input) {

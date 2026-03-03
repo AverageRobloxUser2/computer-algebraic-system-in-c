@@ -124,3 +124,17 @@ bool ast_node_is_same_node(AstNode *node_a, AstNode *node_b) {
 
     return true;
 }
+
+bool ast_node_only_contains_numbers(AstNode *node) {
+    bool all_numbers = true;
+
+    for(size_t i = 0;i < node->child_count; i++) {
+        AstNode *child = node->children_ptrs[i];
+        if (child->type != MathNumberToken) {
+            all_numbers = false;
+            break;
+        }
+    }
+
+    return all_numbers;
+}

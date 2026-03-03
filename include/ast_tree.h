@@ -51,6 +51,7 @@ void print_ast_as_string(AstNode *node);
 char *ast_node_to_string(AstNode* node);
 
 bool ast_node_is_same_node(AstNode *node_a, AstNode *node_b);
+bool ast_node_only_contains_numbers(AstNode *node);
 
 char *ast_node_to_equation(AstNode *node);
 
@@ -62,11 +63,14 @@ bool ast_node_expand_unary(AstNode *node);
 bool ast_node_subtraction_into_negated_addition(AstNode *node);
 bool ast_node_division_into_multiplication(AstNode *node);
 
+bool ast_node_constant_fold(AstNode *node);
+
 bool ast_node_simplify_multiplication_convert_to_power(AstNode *node);
 bool ast_node_simplify_addition_convert_to_multiplication(AstNode *node);
 bool ast_node_simplify_same_multiplicator_addition(AstNode *node);
 bool ast_node_simplify_multipliaction_by_1(AstNode *node);
 bool ast_node_simplify_double_unary(AstNode *node);
+bool ast_node_simplify_power_identities(AstNode *node);
 
 
 #endif

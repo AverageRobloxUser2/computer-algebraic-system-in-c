@@ -46,6 +46,13 @@ add_library(
     "src/ast_tree/simplify/addition_with_same_multiplicator.c"
     "src/ast_tree/simplify/concated_power_into_multiplicated_power.c"
     "src/ast_tree/simplify/subtract_into_negated_addition.c"
+    "src/ast_tree/simplify/constant_folder.c"
+    "src/ast_tree/simplify/power_identities.c"
+)
+
+target_link_libraries(
+    "cas"
+    "m"
 )
 
 target_link_libraries(

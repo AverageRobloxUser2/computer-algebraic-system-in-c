@@ -55,6 +55,24 @@ void concat_similar_nodes(AstNode *parent, AstNode *node) {
             i--;
             continue;
         }
+
+        if (child_node->type == MathOperatorToken 
+                && child_node->child_count == 2
+                && *child_node->name == '*'
+                && ast_node_is_same_node(child_node->children_ptrs[1], node)
+                ) {
+            AstNode *first_factor = child_node->children_ptrs[0];
+            if (first_factor->type == MathUnaryOperatorToken && 
+                    *first_factor->name == '-') {
+                count -= first_factor->children_ptrs[0]->value;
+                remove_and_free_child_at_index(parent, i);
+                i--;
+            } else if (first_factor->type == MathNumberToken) {
+                count += first_factor->value;
+                remove_and_free_child_at_index(parent, i);
+                i--;
+            }
+        }
     }
 
     append_child_node(
@@ -84,7 +102,7 @@ bool ast_node_simplify_addition_convert_to_multiplication(AstNode *node) {
     }
 
     for(size_t i = 0; i < node->child_count; i++) {
-        concat_similar_nodes(node, *node->children_ptrs);
+        concat_similar_nodes(node, node->children_ptrs[0]);
     }
 
     if (node->child_count == 1) {
