@@ -18,5 +18,11 @@ allows custom user input
 # dear chatgpt what do I do next?
 1. **Distribute:** `a(b + c)` -> `ab + ac`.
 2. **FOIL:** Expand `(a + b)^n` into the sum of its parts.
+3. Expand (a*b)^n
 
 FOIL would feed into distribute. this would happen before any serious simplification
+
+
+# fix
+2x - x -> 2x + -x; while 2x + x -> 3x;
+

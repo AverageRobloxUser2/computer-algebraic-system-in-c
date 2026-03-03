@@ -43,7 +43,7 @@ bool ast_node_simplify_multipliaction_by_1(AstNode *node) {
 
     if (has_zero) {
         for(size_t i = 0; i < node->child_count; i++) {
-            remove_and_free_child_at_index(node, 0);
+            free_ast(node->children_ptrs[i]);
         }
 
         replace_node_with_another(

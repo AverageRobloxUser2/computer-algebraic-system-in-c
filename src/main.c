@@ -38,7 +38,7 @@ int main() {
     // do_things("x + x + y - x");         // Expected: +(x, y) [Term collection]
     // do_things("3*a - a - a - a");       // Expected: 0 [Coefficient math]
     //
-    do_things("2a-a-a");
+    // do_things("2a-a-a");
     // // --- Round 4: Distribution & Expansion (The Expansion Strategy) ---
     // // do_things("a * (b + c) - a*b");     // Expected: a*c [Distribution + Subtraction]
     // // do_things("(x+1)*(x-1)");           // Expected: x^2 - 1 [FOIL / Difference of squares]

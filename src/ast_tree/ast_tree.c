@@ -111,7 +111,6 @@ void simplify_itteration(AstNode *node) {
     ast_node_simplify_multiplication_convert_to_power(node);
 
     ast_node_simplify_multipliaction_by_1(node);
-
     ast_node_simplify_same_multiplicator_addition(node);
     sort_node(node);
     ast_node_constant_fold(node);

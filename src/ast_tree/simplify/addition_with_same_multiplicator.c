@@ -57,25 +57,31 @@ void extract_factors_from_addition_node(AstNode *addition_node, AstNode *factor_
         addend_node = deep_clone_node(addend_node);
         int factor_index = find_child_index(addend_node, factor_clone);
 
+        remove_and_free_child_at_index(addition_node, i);
+        // since we remove 1 child we move "i" one back too
+        i--;
+
         if (factor_index == -1) {
             append_child_node(result_node, addend_node);
             continue;
         }
-
-        remove_and_free_child_at_index(addition_node, i);
-        // since we remove 1 child we move "i" one back too
-        i--;
 
         remove_and_free_child_at_index(addend_node, factor_index);
 
         if (addend_node->child_count == 1) {
             append_child_node(
                 addend_holder_node, 
-                deep_clone_node(addend_node->children_ptrs[0])
+                addend_node->children_ptrs[0]
             );
-            free_ast(addend_node);
-        } else {
+            free(addend_node->children_ptrs);
+            free(addend_node->name);
+            free(addend_node);
+
+        } else if (addend_node->child_count > 1) {
             append_child_node(addend_holder_node, addend_node);
+        } else {
+            append_child_node(addend_holder_node, create_number_node(0));
+            free_ast(addend_node);
         }
     }
 
@@ -84,13 +90,21 @@ void extract_factors_from_addition_node(AstNode *addition_node, AstNode *factor_
     if (result_node->child_count == 1) {
         replace_node_with_another(
                 addition_node, 
-                deep_clone_node(result_node->children_ptrs[0])
+                result_node->children_ptrs[0]
         );
-        free_ast(result_node);
-    } else {
+        free(result_node->children_ptrs);
+        free(result_node->name);
+        free(result_node);
+
+        return;
+    } else if (result_node->child_count > 0) {
         replace_node_with_another(addition_node, result_node);
+        return;
+    } else {
+        replace_node_with_another(addition_node, create_number_node(0));
+        free_ast(result_node);
+        return;
     }
-    free_ast(factor_node);
 }
 
 bool ast_node_simplify_same_multiplicator_addition(AstNode *node) {
