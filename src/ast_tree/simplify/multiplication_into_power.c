@@ -113,6 +113,10 @@ bool ast_node_simplify_multiplication_convert_to_power(AstNode *node) {
 
     for(size_t i = 0; i < node->child_count; i++) {
         AstNode *current_node = node->children_ptrs[0];
+        if (current_node->type == MathOperatorToken && *current_node->name == '^') {
+            concat_power_nodes(node, current_node->children_ptrs[0]);
+            continue;
+        }
         concat_power_nodes(node, current_node);
     }
 

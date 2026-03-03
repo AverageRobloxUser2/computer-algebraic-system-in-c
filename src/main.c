@@ -21,13 +21,10 @@ int main() {
 
     do_things(user_input);
 
-    // do_things(user_input);
     free(user_input);
     clock_t ending_clocks = clock();
     clock_t delta_clocks = ending_clocks - starting_clocks;
     printf("Done in: %lf\n", (double)delta_clocks / CLOCKS_PER_SEC);
-
-    printf("Simplified is: ");
 
     return 0;
 }
