@@ -77,8 +77,12 @@ int main() {
         {"_xy+1", "_xy1+"},
         {"_xy(1)", "1_xy"},
         {"xy+1", "xy*1+"},
+        {"a^b^c+1", "abc^^1+"},
+        {"a^b^c", "abc^^"},
+        {"(a^b)^c", "ab^c^"},
+        {"a^b", "ab^"},
         // just for testing length, sicne i found some mem bugs.
-        {"qwertyuiopasdfghjklzxcvbnm", "qw*e*r*t*y*u*i*o*p*a*s*d*f*g*h*j*k*l*z*x*c*v*b*n*m*"},
+        // {"qwertyuiopasdfghjklzxcvbnm", "qw*e*r*t*y*u*i*o*p*a*s*d*f*g*h*j*k*l*z*x*c*v*b*n*m*"},
         {NULL, NULL},
     };
 

@@ -48,10 +48,10 @@ void concat_power_nodes(AstNode *parent, AstNode *node) {
                         node
                 )) {
 
-                for(size_t j = 1; j < child_node->child_count; j++) {
+                if (child_node->child_count == 2) {
                     append_child_node(
                         exponent_holder, 
-                        deep_clone_node(child_node->children_ptrs[j])
+                        deep_clone_node(child_node->children_ptrs[1])
                     );
                 }
 

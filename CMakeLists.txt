@@ -42,8 +42,9 @@ add_library(
     "src/ast_tree/simplify/multiplication_into_power.c"
     "src/ast_tree/simplify/addition_into_multiplication.c"
     "src/ast_tree/simplify/multiplication_by_1.c"
+    "src/ast_tree/simplify/double_unary_simplified.c"
     "src/ast_tree/simplify/addition_with_same_multiplicator.c"
-    "src/ast_tree/simplify/division_by_1.c"
+    "src/ast_tree/simplify/concated_power_into_multiplicated_power.c"
     "src/ast_tree/simplify/subtract_into_negated_addition.c"
 )
 

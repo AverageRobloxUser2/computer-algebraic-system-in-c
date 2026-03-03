@@ -92,6 +92,30 @@ char *ast_node_to_string(AstNode *node) {
     return result;
 }
 
+void simplify_itteration(AstNode *node) {
+    ast_node_subtraction_into_negated_addition(node);
+
+    ast_node_concated_power_into_multiplication(node);
+    sort_node(node);
+    ast_node_concat_operators(node);
+
+    ast_node_division_into_multiplication(node);
+
+    ast_node_simplify_double_unary(node);
+    ast_node_expand_unary(node);
+
+    ast_node_simplify_addition_convert_to_multiplication(node);
+    sort_node(node);
+
+    ast_node_concated_power_into_multiplication(node);
+    ast_node_simplify_multiplication_convert_to_power(node);
+
+    ast_node_simplify_multipliaction_by_1(node);
+
+    ast_node_simplify_same_multiplicator_addition(node);
+    sort_node(node);
+}
+
 AstNode *string_to_ast_node(char *input) {
     char *writable_input = calloc(strlen(input) + 1, sizeof(char));
     strcpy(writable_input, input);
@@ -108,24 +132,9 @@ AstNode *string_to_ast_node(char *input) {
     AstNode *node = postfix_to_ast(postfix);
     free_equation(postfix);
 
-
-
-    ast_node_subtraction_into_negated_addition(node);
-    print_ast_tree_as_graphviz(node);
-    ast_node_division_into_multiplication(node);
-
-    ast_node_concat_operators(node);
-    sort_node(node);
-
-    ast_node_simplify_addition_convert_to_multiplication(node);
-    sort_node(node);
-
-    ast_node_simplify_multiplication_convert_to_power(node);
-
-    ast_node_simplify_multipliaction_by_1(node);
-
-    ast_node_simplify_same_multiplicator_addition(node);
-    sort_node(node);
+    for(size_t i = 0; i < 10; i++) {
+        simplify_itteration(node);
+    }
 
     return node;
 }

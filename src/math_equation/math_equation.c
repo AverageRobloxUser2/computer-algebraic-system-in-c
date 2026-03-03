@@ -17,7 +17,6 @@ bool is_left_associative(char operator) {
 size_t get_precedence_for_operator(char operator) {
     switch (operator) {
         case '!':
-            return 4;
         case '^':
             return 4;
 

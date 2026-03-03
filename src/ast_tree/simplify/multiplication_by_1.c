@@ -18,25 +18,39 @@ bool ast_node_simplify_multipliaction_by_1(AstNode *node) {
         return false;
     }
 
-    bool is_negated = false;
+    bool has_zero = false;
 
     for(size_t i = 0; i < node->child_count; i++){
         AstNode *factor_node = node->children_ptrs[i];
-
-        if (factor_node->type == MathUnaryOperatorToken && *factor_node->name == '-') {
-            is_negated = !is_negated;
-        }
 
         if (factor_node->type != MathNumberToken) {
             continue;
         }
 
 
+        if (factor_node->value == 0) {
+            has_zero = true;
+            break;
+        }
+
         if ((factor_node->value * factor_node->value) != 1) {
             continue;
         }
+
         remove_and_free_child_at_index(node, i);
         i--;
+    }
+
+    if (has_zero) {
+        for(size_t i = 0; i < node->child_count; i++) {
+            remove_and_free_child_at_index(node, 0);
+        }
+
+        replace_node_with_another(
+            node,
+            create_number_node(0)
+        );
+        return true;
     }
 
 
@@ -50,12 +64,6 @@ bool ast_node_simplify_multipliaction_by_1(AstNode *node) {
             node,
             create_number_node(1)
         );
-    }
-
-    if (is_negated) {
-        AstNode *negate_node = create_new_node(MathUnaryOperatorToken, "-");
-        append_child_node(negate_node, deep_clone_node(node));
-        replace_node_with_another(node, negate_node);
     }
 
     return true;
