@@ -7,6 +7,11 @@
 
 void sort_node(AstNode *node) {
 
+    for(size_t i = 0; i < node->child_count; i++) {
+        AstNode *child_node = node->children_ptrs[i];
+        sort_node(child_node);
+    }
+
     if (node->type != MathOperatorToken) {
         return;
     }
@@ -17,10 +22,6 @@ void sort_node(AstNode *node) {
         }
     }
 
-    for(size_t i = 0; i < node->child_count; i++) {
-        AstNode *child_node = node->children_ptrs[i];
-        sort_node(child_node);
-    }
 
     for(size_t i = 0; i < node->child_count; i++) {
         AstNode *child_node_i = node->children_ptrs[i];
