@@ -62,11 +62,12 @@ void extract_factors_from_addition_node(AstNode *addition_node, AstNode *factor_
             continue;
         }
 
-        remove_and_free_child(addition_node, addend_node);
+        remove_and_free_child_at_index(addition_node, i);
         // since we remove 1 child we move "i" one back too
         i--;
 
-        remove_and_free_child(addend_node, factor_clone);
+        remove_and_free_child_at_index(addend_node, factor_index);
+
         if (addend_node->child_count == 1) {
             append_child_node(
                 addend_holder_node, 
@@ -89,6 +90,7 @@ void extract_factors_from_addition_node(AstNode *addition_node, AstNode *factor_
     } else {
         replace_node_with_another(addition_node, result_node);
     }
+    free_ast(factor_node);
 }
 
 bool ast_node_simplify_same_multiplicator_addition(AstNode *node) {

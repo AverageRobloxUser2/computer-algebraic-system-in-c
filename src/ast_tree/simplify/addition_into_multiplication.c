@@ -46,10 +46,10 @@ void concat_similar_nodes(AstNode *parent, AstNode *node) {
         }
         // unary operator and inside operator is same node
         // example node "a" and node "u_-(a)"
-        if (child_node->type == MathUnaryOperatorToken && ast_node_is_same_node(
-                    child_node->children_ptrs[0],
-                    node
-        )) {
+        if (child_node->type == MathUnaryOperatorToken 
+                && ast_node_is_same_node( child_node->children_ptrs[0], node)
+                && *child_node->name == '-'
+                ) {
             count --;
             remove_and_free_child_at_index(parent, i);
             i--;
