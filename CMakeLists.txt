@@ -48,6 +48,8 @@ add_library(
     "src/ast_tree/simplify/subtract_into_negated_addition.c"
     "src/ast_tree/simplify/constant_folder.c"
     "src/ast_tree/simplify/power_identities.c"
+    "src/ast_tree/simplify/expand_multiplicated_power.c"
+    "src/ast_tree/simplify/expand_multiplication.c"
 )
 
 target_link_libraries(

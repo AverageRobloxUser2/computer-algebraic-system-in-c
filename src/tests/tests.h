@@ -18,7 +18,7 @@ void print_as_passed(TestCase test_case) {
 }
 
 void print_as_failed(TestCase test_case, char *output) {
-    printf(ANSI_COLOR_RED "FAILED: %s -> \"%s\"\n", test_case.input, test_case.output);
+    printf(ANSI_COLOR_RED "FAILED: %s -> \"%s\"; ", test_case.input, test_case.output);
     printf("GOT: \"%s\"\n" ANSI_COLOR_RESET, output);
 }
 

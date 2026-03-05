@@ -39,6 +39,7 @@ void concat_power_nodes(AstNode *parent, AstNode *node) {
             remove_and_free_child_at_index(parent, i);
             number_exponent++;
             i--;
+            continue;
         }
         // unary operator and inside operator is same node
         // example node "a" and node "u_-(a)"

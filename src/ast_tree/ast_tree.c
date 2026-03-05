@@ -39,8 +39,10 @@ void free_ast(AstNode *node) {
 
     free(node->name);
     free(node->children_ptrs);
+
     node->name = NULL;
     node->children_ptrs = NULL;
+
     free(node);
 }
 
@@ -93,9 +95,9 @@ char *ast_node_to_string(AstNode *node) {
 }
 
 void simplify_itteration(AstNode *node) {
-    ast_node_subtraction_into_negated_addition(node);
 
     ast_node_concated_power_into_multiplication(node);
+    ast_node_subtraction_into_negated_addition(node);
     sort_node(node);
     ast_node_concat_operators(node);
 
@@ -108,15 +110,18 @@ void simplify_itteration(AstNode *node) {
     sort_node(node);
 
     ast_node_concated_power_into_multiplication(node);
+    ast_node_concat_operators(node);
     ast_node_simplify_multiplication_convert_to_power(node);
 
     ast_node_simplify_multipliaction_by_1(node);
     ast_node_simplify_same_multiplicator_addition(node);
+
+    ast_node_expand_multiplicated_power(node);
+    ast_node_expand_multipcation(node);
     sort_node(node);
     ast_node_constant_fold(node);
     sort_node(node);
     ast_node_simplify_power_identities(node);
-    sort_node(node);
 }
 
 AstNode *string_to_ast_node(char *input) {
@@ -135,9 +140,9 @@ AstNode *string_to_ast_node(char *input) {
     AstNode *node = postfix_to_ast(postfix);
     free_equation(postfix);
 
-    // for(size_t i = 0; i < 10; i++) {
+    for(size_t i = 0; i < 10; i++) {
         simplify_itteration(node);
-    // }
+    }
 
     return node;
 }

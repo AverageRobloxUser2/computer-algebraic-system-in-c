@@ -23,6 +23,4 @@ allows custom user input
 FOIL would feed into distribute. this would happen before any serious simplification
 
 
-# fix
-1. 2x - x -> 2x + -x; while 2x + x -> 3x;
-
+# to fix

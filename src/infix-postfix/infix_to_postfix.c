@@ -145,7 +145,7 @@ PostfixEquation convert_infix_to_postfix(InfixEquation equation) {
                 );
                 size_t last_precedence = get_precedence_for_operator(*last_token.value);
 
-                printf("last %zu, new %zu\n", last_precedence, current_precedence);
+                // printf("last %zu, new %zu\n", last_precedence, current_precedence);
                 if (last_precedence >= current_precedence) {
                     append_to_result(&result, last_token);
                     continue;

@@ -103,9 +103,9 @@ bool ast_node_simplify_addition_convert_to_multiplication(AstNode *node) {
 
     for(size_t i = 0; i < node->child_count; i++) {
         AstNode *child = node->children_ptrs[0];
-        // if (child->type == MathUnaryOperatorToken && *child->name == '-') {
-        //     child = child->children_ptrs[0];
-        // }
+        if (child->type == MathUnaryOperatorToken && *child->name == '-') {
+            child = child->children_ptrs[0];
+        }
         concat_similar_nodes(node, child);
     }
 

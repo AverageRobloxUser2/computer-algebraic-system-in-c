@@ -9,6 +9,7 @@ void do_things(char *input) {
     // print_ast_as_string(node);
     char *eq = ast_node_to_equation(node);
     printf("%s -> %s\n", input, eq);
+    print_ast_as_string(node);
     free(eq);
     free_ast(node);
 }

@@ -44,7 +44,7 @@ void constant_fold_multiplication(AstNode *node) {
                 && *factor_node->name == '-') {
             AstNode *value = factor_node->children_ptrs[0];
             if (value->type == MathNumberToken) {
-                total_result *= value->value;
+                total_result *= -value->value;
                 remove_and_free_child_at_index(node, i);
                 i--;
             }
