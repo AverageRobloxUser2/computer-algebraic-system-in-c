@@ -28,7 +28,7 @@ void do_implicit_multiplication_checks(
 
     if (previous_token.type == MathParenthasisClosedToken &&
             token.type != MathOperatorToken &&
-            previous_token.type != MathParenthasisClosedToken ) {
+            token.type != MathParenthasisClosedToken ) {
         // triggers for cases like this.
         // ...)2 or ...)sin(2) or ...)(... but not for ...)+x
         add_token(

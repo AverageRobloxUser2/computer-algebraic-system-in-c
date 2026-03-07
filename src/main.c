@@ -10,8 +10,9 @@ void do_things(char *input) {
     // char *eq = ast_node_to_equation(node);
     // printf("%s -> %s\n", input, eq);
     // ast_node_simplify_addition_with_fractions(node);
-    print_ast_as_string(node);
+    // print_ast_as_string(node);
     print_ast_as_equation(node);
+    print_ast_tree_as_graphviz(node);
     // free(eq);
     free_ast(node);
 }

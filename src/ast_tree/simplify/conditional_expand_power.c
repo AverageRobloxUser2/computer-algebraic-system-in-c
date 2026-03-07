@@ -66,6 +66,7 @@ bool ast_node_conditionaly_expand_power(AstNode *node) {
         append_child_node(result_node, deep_clone_node(base_node));
     }
 
+    ast_node_expand_multipcation(result_node);
     ast_free_children(node);
     replace_node_with_another(node, result_node);
 }

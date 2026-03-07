@@ -1,6 +1,5 @@
 #include "ast_tree.h"
 #include "math_equation.h"
-#include "rules.h"
 #include <stddef.h>
 
 
@@ -43,24 +42,23 @@ bool ast_node_expand_multipcation(AstNode *node) {
     AstNode *result_addition_node = create_new_node(MathOperatorToken, "+");
     AstNode *factor_node = node->children_ptrs[first_factor_equation_node_index];
 
-
     for(size_t i = 0; i < factor_node->child_count; i++) {
         AstNode *inner_factor_node = factor_node->children_ptrs[i];
+        AstNode *addend_multiplication = create_new_node(MathOperatorToken, "*");
+        append_child_node(
+            addend_multiplication, 
+            deep_clone_node(inner_factor_node)
+        );
         for(size_t j = 0; j < node->child_count; j++) {
             if (j == first_factor_equation_node_index) {
                 continue;
             }
-            AstNode *addend_multiplication = create_new_node(MathOperatorToken, "*");
-            append_child_node(
-                addend_multiplication, 
-                deep_clone_node(inner_factor_node)
-            );
             append_child_node(
                 addend_multiplication, 
                 deep_clone_node(node->children_ptrs[j])
             );
-            append_child_node(result_addition_node, addend_multiplication);
         }
+        append_child_node(result_addition_node, addend_multiplication);
     }
 
     ast_free_children(node);

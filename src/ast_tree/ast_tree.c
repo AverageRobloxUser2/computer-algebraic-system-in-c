@@ -108,7 +108,7 @@ void simplify_node_thing(AstNode *node) {
 
     AstNode *before = deep_clone_node(node);
 
-    for(size_t i = 0; i < 50; i++) {
+    for(size_t i = 0; i < 20; i++) {
 
         ast_node_simplify_multipliaction_by_1(node);
         ast_node_simplify_double_unary(node);
@@ -142,6 +142,7 @@ void simplify_node_thing(AstNode *node) {
 
     free_ast(before);
 
+    ast_node_constant_fold(node);
     ast_node_simplify_same_multiplicator_addition(node);
     sort_node(node);
 }
