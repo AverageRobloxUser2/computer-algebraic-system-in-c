@@ -154,6 +154,7 @@ bool ast_node_only_contains_numbers(AstNode *node) {
     return all_numbers;
 }
 
+
 void ast_shallow_free(AstNode *node) {
     free(node->name);
     free(node->children_ptrs);
@@ -170,5 +171,3 @@ void ast_free_children(AstNode *node) {
     free(node->children_ptrs);
     node->children_ptrs = NULL;
 }
-
-

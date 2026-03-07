@@ -42,6 +42,7 @@ void free_ast(AstNode *node) {
 
     node->name = NULL;
     node->children_ptrs = NULL;
+    node->child_count = 0;
 
     free(node);
 }
@@ -116,6 +117,7 @@ void simplify_node_thing(AstNode *node) {
 
         ast_node_conditionaly_expand_power(node);
         ast_node_expand_multiplicated_power(node);
+
         ast_node_expand_multipcation(node);
 
         ast_node_simplify_addition_convert_to_multiplication(node);
@@ -125,13 +127,18 @@ void simplify_node_thing(AstNode *node) {
         ast_node_concated_power_into_multiplication(node);
         ast_node_concat_operators(node);
 
+        ast_node_simplify_multipliaction_by_1(node);
+        print_ast_as_equation(node);
+
+
         sort_node(node);
         ast_node_constant_fold(node);
         sort_node(node);
         ast_node_simplify_power_identities(node);
-        ast_node_simplify_multipliaction_by_1(node);
+        ast_node_constant_fold(node);
 
         ast_node_simplify_addition_with_fractions(node);
+
 
         if (ast_node_is_same_node(before, node)) {
             break;

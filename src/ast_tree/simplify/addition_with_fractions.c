@@ -166,6 +166,17 @@ bool ast_node_simplify_addition_with_fractions(AstNode *node) {
     for(size_t i = 0; i < node->child_count; i++) {
         AstNode *child_addend = node->children_ptrs[i];
 
+
+        if (child_addend->type == MathOperatorToken && *child_addend->name == '^') {
+            AstNode *temp_child_holder = create_new_node(MathOperatorToken, "*");
+            append_child_node(temp_child_holder, create_number_node(1));
+            append_child_node(temp_child_holder, child_addend);
+
+            node->children_ptrs[i] = temp_child_holder;
+            i--;
+            continue;
+        }
+
         if (!is_fraction(child_addend)) {
             continue;
         }
@@ -181,35 +192,45 @@ bool ast_node_simplify_addition_with_fractions(AstNode *node) {
     // printf("Fractions only has %zu children\n", fractions_only->child_count);
 
     AstNode *common_denominator = find_common_denominator(fractions_only);
-    ast_node_simplify_multiplication_convert_to_power(common_denominator);
-    ast_node_constant_fold(common_denominator);
 
-    if (ast_node_matches_requirements(common_denominator, MathOperatorToken, "^")) {
-        free_ast(common_denominator);
-        return false;
+    for(int i = 0; i < (int)common_denominator->child_count; i++) {
+        AstNode *child = common_denominator->children_ptrs[i];
+        if (find_child_index(common_denominator, child) != i) {
+            free_ast(common_denominator);
+            free_ast(fractions_only);
+            return false;
+        }
     }
+
+    // ast_node_simplify_power_identities(common_denominator);
+    // ast_node_simplify_multipliaction_by_1(common_denominator);
 
     // printf("common_denominator:");
     // print_ast_as_string(common_denominator);
+
     AstNode *numerator = compute_fraction_numerator(fractions_only, common_denominator);
-    ast_node_constant_fold(numerator);
+    // ast_node_simplify_power_identities(numerator);
+    // ast_node_simplify_multipliaction_by_1(numerator);
+    //
     // printf("numerator:");
     // print_ast_as_string(numerator);
+
     AstNode *result = create_new_node(MathOperatorToken, "/"); 
+
     append_child_node(result, numerator);
     append_child_node(result, common_denominator);
 
-    ast_node_constant_fold(result);
-    ast_node_simplify_power_identities(result);
-    ast_node_simplify_multiplication_convert_to_power(result);
-
-    // printf("result:");
-    // print_ast_as_string(result);
     ast_node_division_into_multiplication(result);
+
 
     for(size_t i = 0; i < fractions_only->child_count; i++) {
         remove_and_free_child(node, fractions_only->children_ptrs[i]);
     }
+
+    ast_node_constant_fold(result);
+    ast_node_simplify_power_identities(result);
+    ast_node_simplify_multipliaction_by_1(result);
+    ast_node_constant_fold(result);
 
     free_ast(fractions_only);
 

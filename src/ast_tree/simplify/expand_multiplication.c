@@ -1,6 +1,7 @@
 #include "ast_tree.h"
 #include "math_equation.h"
 #include <stddef.h>
+#include <stdio.h>
 
 
 bool ast_node_expand_multipcation(AstNode *node) {
@@ -8,11 +9,7 @@ bool ast_node_expand_multipcation(AstNode *node) {
         ast_node_expand_multipcation(node->children_ptrs[i]);
     }
 
-    if (node->type != MathOperatorToken) {
-        return false;
-    }
-
-    if (*node->name != '*') {
+    if(!ast_node_matches_requirements(node, MathOperatorToken, "*")) {
         return false;
     }
 
@@ -21,6 +18,7 @@ bool ast_node_expand_multipcation(AstNode *node) {
 
     for(size_t i = 0; i < node->child_count; i++) {
         AstNode *factor = node->children_ptrs[i];
+
         if (factor->type != MathOperatorToken) {
             continue;
         }
@@ -38,7 +36,6 @@ bool ast_node_expand_multipcation(AstNode *node) {
         return false;
     }
 
-
     AstNode *result_addition_node = create_new_node(MathOperatorToken, "+");
     AstNode *factor_node = node->children_ptrs[first_factor_equation_node_index];
 
@@ -50,9 +47,11 @@ bool ast_node_expand_multipcation(AstNode *node) {
             deep_clone_node(inner_factor_node)
         );
         for(size_t j = 0; j < node->child_count; j++) {
+
             if (j == first_factor_equation_node_index) {
                 continue;
             }
+
             append_child_node(
                 addend_multiplication, 
                 deep_clone_node(node->children_ptrs[j])
@@ -62,7 +61,9 @@ bool ast_node_expand_multipcation(AstNode *node) {
     }
 
     ast_free_children(node);
+    ast_node_concat_operators(result_addition_node);
+    ast_node_expand_multipcation(result_addition_node);
     replace_node_with_another(node, result_addition_node);
-    ast_node_concat_operators(node);
-    ast_node_expand_multipcation(node);
+
+    return true;
 }
