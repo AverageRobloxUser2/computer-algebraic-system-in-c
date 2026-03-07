@@ -98,33 +98,30 @@ char *ast_node_to_string(AstNode *node) {
 
 void simplify_node_thing(AstNode *node) {
 
-    printf("%d.", -1);
-    print_ast_as_string(node);
     ast_node_division_into_multiplication(node);
     ast_node_concated_power_into_multiplication(node);
-    ast_node_subtraction_into_negated_addition(node);
+
     ast_node_concat_operators(node);
-    sort_node(node);
+
     ast_node_simplify_multiplication_convert_to_power(node);
-
-
-    char *last_value = NULL; 
+    ast_node_subtraction_into_negated_addition(node);
+    sort_node(node);
 
     size_t i = 0;
-    for(; i < 50; i++) {
-        char *current_value = ast_node_to_string(node);
-        if (last_value != NULL && strcmp(last_value, current_value) == 0) {
-            break;
-        }
-        if (last_value != NULL) {
-            free(last_value);
-        }
-        last_value = current_value;
-        printf("%zu.", i);
-        print_ast_as_string(node);
+    for(; i < 10; i++) {
+        // printf("%zu\n", i);
+        // print_ast_as_string(node);
 
         ast_node_simplify_double_unary(node);
         ast_node_expand_unary(node);
+
+        ast_node_simplify_multipliaction_by_1(node);
+        ast_node_conditionaly_expand_power(node);
+        ast_node_expand_multiplicated_power(node);
+        ast_node_expand_multipcation(node);
+
+        // printf("\t");
+        // print_ast_as_string(node);
 
         ast_node_simplify_addition_convert_to_multiplication(node);
         ast_node_simplify_multiplication_convert_to_power(node);
@@ -133,25 +130,22 @@ void simplify_node_thing(AstNode *node) {
         ast_node_concated_power_into_multiplication(node);
         ast_node_concat_operators(node);
 
-        ast_node_simplify_multipliaction_by_1(node);
+        // printf("\t");
+        // print_ast_as_string(node);
 
-        // ast_node_conditionaly_expand_power(node);
-        ast_node_expand_multiplicated_power(node);
-        ast_node_expand_multipcation(node);
 
         sort_node(node);
         ast_node_constant_fold(node);
         sort_node(node);
         ast_node_simplify_power_identities(node);
         sort_node(node);
-    }
 
-    free(last_value);
+        // printf("\t");
+        // print_ast_as_string(node);
+    }
 
     ast_node_simplify_same_multiplicator_addition(node);
     sort_node(node);
-
-
 }
 
 AstNode *string_to_ast_node(char *input) {

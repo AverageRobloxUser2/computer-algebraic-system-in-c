@@ -44,6 +44,10 @@ bool ast_node_concated_power_into_multiplication(AstNode *node) {
     remove_and_free_child_at_index(node, 1);
     remove_and_free_child_at_index(exponent_base, 1);
 
+    if (exponent_base->child_count == 1) {
+        replace_node_with_another(exponent_base, exponent_base->children_ptrs[0]);
+    }
+
     append_child_node(node, factor_holder);
 
     return true;

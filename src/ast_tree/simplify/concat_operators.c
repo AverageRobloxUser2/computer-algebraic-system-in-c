@@ -6,19 +6,19 @@
 #include <string.h>
 
 bool simplify_node(AstNode *node) {
+    // finds a child node in node of same type and name
+    // example adition node inside addition +(a,+(b,c))
+    // and converts them  +(a,b,c)
+    // for power node
+    // a^b^c -> ^(a,b,c)
+    // but for (a^b)^c -> ^(^(a,b), c)
     if (node->type == MathUnaryOperatorToken) {
         return false;
     }
     AstNode *child = NULL;
     size_t i = 0;
-    if (node->type == MathOperatorToken && *node->name == '^') {
-        // i = 1;
-    } else {
-        i = 0;
-    }
     for(; i < node->child_count; i++){
         AstNode *current_child = node->children_ptrs[i];
-
 
         if (current_child->type != node->type) {
             continue;
@@ -27,6 +27,11 @@ bool simplify_node(AstNode *node) {
         if (strcmp(current_child->name, node->name) != 0) {
             continue;
         }
+
+        if (i == 0 && node->type == MathOperatorToken && *node->name == '^') {
+            continue;
+        }
+
         child = current_child;
         break;
     }
@@ -51,11 +56,13 @@ bool simplify_node(AstNode *node) {
     //     node_child_ptrs_length_after
     // );
 
-    memcpy(
-        new_child_ptrs,
-        node->children_ptrs,
-        node_child_ptrs_length_before
-    );
+    if (node_child_ptrs_length_before > 0) {
+        memcpy(
+            new_child_ptrs,
+            node->children_ptrs,
+            node_child_ptrs_length_before
+        );
+    }
 
     memcpy(
         new_child_ptrs + i,
@@ -63,12 +70,16 @@ bool simplify_node(AstNode *node) {
         child_node_child_ptrs_length
     );
 
-    memcpy(
-        new_child_ptrs + i + child->child_count,
-        node->children_ptrs + i + 1,
-        node_child_ptrs_length_after
-    );
+    if (node_child_ptrs_length_after > 0) {
+        memcpy(
+            new_child_ptrs + i + child->child_count,
+            node->children_ptrs + i + 1,
+            node_child_ptrs_length_after
+        );
+    }
 
+    // -1 because we insert child in between our node children
+    // that way we no longer represent it in node->children_ptrs
     node->child_count = node->child_count + child->child_count - 1;
 
     free(child->name);

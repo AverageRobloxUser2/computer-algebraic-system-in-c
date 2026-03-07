@@ -69,4 +69,5 @@ bool ast_node_expand_multipcation(AstNode *node) {
 
     replace_node_with_another(node, result_addition_node);
     ast_node_concat_operators(node);
+    ast_node_expand_multipcation(node);
 }
