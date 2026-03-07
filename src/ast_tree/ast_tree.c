@@ -128,7 +128,6 @@ void simplify_node_thing(AstNode *node) {
         ast_node_concat_operators(node);
 
         ast_node_simplify_multipliaction_by_1(node);
-        print_ast_as_equation(node);
 
 
         sort_node(node);

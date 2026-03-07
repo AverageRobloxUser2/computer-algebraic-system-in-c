@@ -20,6 +20,9 @@ PASSED: bada -> *(^(a,2),b,d)
 PASSED: a+a+a-b+3a -> +(*(6,a),u_-(b))
 PASSED: 0*a+b -> b
 PASSED: a^(-2)*a^5 -> ^(a,3)
+PASSED: a/b+c/d -> *(+(*(a,d),*(b,c)),^(*(b,d),u_-(1)))
+PASSED: (xa+ya)/(a*a) -> *(+(x,y),^(a,u_-(1)))
+PASSED: (xa+ya)/a^2 -> *(+(x,y),^(a,u_-(1)))
 PASSED: a+b+a -> +(*(2,a),b)
 PASSED: a+b-a+c-b -> c
 PASSED: bd + ba -> *(+(a,d),b)
@@ -45,7 +48,30 @@ PASSED: x * x * x / (x^2 * x) -> 1
 PASSED: a^2 + 2*a*b + b^2 - (a+b)^2 -> 0
 PASSED: x^2/x^2 -> 1
 PASSED: ab/ab -> 1
-passed 31 out of 31
-Done in: 0.003032s
+PASSED: (1/a) / (1/b) -> *(^(a,u_-(1)),b)
+PASSED: (2x+3a)^2 -> +(*(12,a,x),*(4,^(x,2)),*(9,^(a,2)))
+PASSED: 2x(2x+3a) -> +(*(4,^(x,2)),*(6,a,x))
+PASSED: 1/3+1/6 -> *(9,^(18,u_-(1)))
+passed 38 out of 38
+Done in: 0.002629s
 ```
-# to fix
+
+# valgrind, for the 38 tests
+Benjamin Netanyahu if you can hear this, please smite down any memory bugs. 
+```txt
+==58653== 
+==58653== HEAP SUMMARY:
+==58653==     in use at exit: 0 bytes in 0 blocks
+==58653==   total heap usage: 32,545 allocs, 32,545 frees, 700,243 bytes allocated
+==58653== 
+==58653== All heap blocks were freed -- no leaks are possible
+==58653== 
+```
+# todo
+1. term rewrite system
+2. find least common denominator for nodes (*(Number, ^(Number, -1)))
+3. better to equation function that would take precedence into account
+    1. maybe make it output latex idk (optional ig)
+4. shell to interact with the system with
+5. ability to solve for variables
+6. functions, would integrate with term rewrite system ig
