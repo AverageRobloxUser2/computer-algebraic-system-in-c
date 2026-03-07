@@ -109,8 +109,6 @@ void simplify_node_thing(AstNode *node) {
 
     size_t i = 0;
     for(; i < 10; i++) {
-        // printf("%zu\n", i);
-        // print_ast_as_string(node);
 
         ast_node_simplify_double_unary(node);
         ast_node_expand_unary(node);
@@ -120,9 +118,6 @@ void simplify_node_thing(AstNode *node) {
         ast_node_expand_multiplicated_power(node);
         ast_node_expand_multipcation(node);
 
-        // printf("\t");
-        // print_ast_as_string(node);
-
         ast_node_simplify_addition_convert_to_multiplication(node);
         ast_node_simplify_multiplication_convert_to_power(node);
         sort_node(node);
@@ -130,18 +125,10 @@ void simplify_node_thing(AstNode *node) {
         ast_node_concated_power_into_multiplication(node);
         ast_node_concat_operators(node);
 
-        // printf("\t");
-        // print_ast_as_string(node);
-
-
         sort_node(node);
         ast_node_constant_fold(node);
         sort_node(node);
         ast_node_simplify_power_identities(node);
-        sort_node(node);
-
-        // printf("\t");
-        // print_ast_as_string(node);
     }
 
     ast_node_simplify_same_multiplicator_addition(node);
