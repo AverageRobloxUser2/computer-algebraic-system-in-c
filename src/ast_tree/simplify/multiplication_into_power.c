@@ -52,23 +52,31 @@ void concat_power_nodes(AstNode *parent, AstNode *node) {
         }
         // unary operator and inside operator is same node
         // example node "a" and node "u_-(a)"
-        if (child_node->type == MathOperatorToken) {
-            if (*child_node->name == '^' && ast_node_is_same_node(
-                        child_node->children_ptrs[0],
-                        node
-                )) {
+        if (child_node->type == MathOperatorToken
+            && *child_node->name == '^' 
+            && ast_node_is_same_node(
+                child_node->children_ptrs[0],
+                node)) {
 
-                if (child_node->child_count == 2) {
+            if (child_node->child_count == 2) {
+                append_child_node(
+                    exponent_holder, 
+                    deep_clone_node(child_node->children_ptrs[1])
+                );
+            } else {
+                AstNode *power_node = create_new_node(MathOperatorToken, "^");
+                for(size_t j = 1; j < child_node->child_count; j++) {
                     append_child_node(
-                        exponent_holder, 
-                        deep_clone_node(child_node->children_ptrs[1])
+                        power_node,
+                        deep_clone_node(child_node->children_ptrs[j])
                     );
-                    remove_and_free_child_at_index(parent, i);
-                    i--;
                 }
-
-                continue;
+                append_child_node(exponent_holder, power_node);
             }
+            remove_and_free_child_at_index(parent, i);
+            i--;
+
+            continue;
         }
     }
 
