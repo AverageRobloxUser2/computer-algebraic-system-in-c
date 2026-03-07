@@ -44,7 +44,7 @@ bool ast_node_subtraction_into_negated_addition(AstNode *node) {
 bool ast_node_division_into_multiplication(AstNode *node) {
     for(size_t i = 0; i < node->child_count; i++) {
         AstNode *child_node = node->children_ptrs[i];
-        ast_node_subtraction_into_negated_addition(child_node);
+        ast_node_division_into_multiplication(child_node);
     }
 
     if(node->type != MathOperatorToken) {
@@ -60,10 +60,7 @@ bool ast_node_division_into_multiplication(AstNode *node) {
     new_children[0] = node->children_ptrs[0];
 
     for(size_t i = 1; i < node->child_count; i++) {
-        AstNode *power_node = create_new_node(
-            MathOperatorToken,
-            "^"
-        );
+        AstNode *power_node = create_new_node(MathOperatorToken, "^");
 
         AstNode *child_node = node->children_ptrs[i];
 
@@ -74,7 +71,7 @@ bool ast_node_division_into_multiplication(AstNode *node) {
 
     free(node->children_ptrs);
     node->children_ptrs = new_children;
-    *(node->name) = '*';
+    node->name[0] = '*';
 
     return true;
 }

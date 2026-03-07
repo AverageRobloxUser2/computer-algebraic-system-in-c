@@ -1,4 +1,5 @@
 #include "lexer.h"
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -132,9 +133,11 @@ LexerToken handle_variable_or_function(char **current_ptr_ptr) {
     char *current_ptr = *current_ptr_ptr;
 
     char *start_ptr = current_ptr;
+    size_t length = 0;
 
     while (check_is_variable_or_function(*current_ptr)) {
         current_ptr++;
+        length ++;
     }
 
     *current_ptr_ptr = current_ptr;
@@ -142,7 +145,7 @@ LexerToken handle_variable_or_function(char **current_ptr_ptr) {
     // function is if it ends with a oepning parenthesis
     // "sin(" -> function
     // "pi" -> not function
-    bool is_function = *current_ptr == '(';
+    bool is_function = *current_ptr == '(' && length > 1 && *start_ptr != '_';
     if (is_function) {
         return create_lexer_token(TokenTypeFunction, start_ptr, current_ptr);
     }

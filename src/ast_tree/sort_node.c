@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 
+
 void sort_node(AstNode *node) {
 
     for(size_t i = 0; i < node->child_count; i++) {

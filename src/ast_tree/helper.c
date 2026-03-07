@@ -125,6 +125,21 @@ bool ast_node_is_same_node(AstNode *node_a, AstNode *node_b) {
     return true;
 }
 
+bool ast_node_matches_requirements(
+    AstNode *node,
+    MathEquationTokenType type,
+    char *name ) {
+    if (node->type != type) {
+        return false;
+    }
+
+    if (strcmp(node->name, name) != 0) {
+        return false;
+    }
+
+    return true;
+}
+
 bool ast_node_only_contains_numbers(AstNode *node) {
     bool all_numbers = true;
 
@@ -155,3 +170,5 @@ void ast_free_children(AstNode *node) {
     free(node->children_ptrs);
     node->children_ptrs = NULL;
 }
+
+

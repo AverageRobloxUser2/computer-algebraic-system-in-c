@@ -27,7 +27,8 @@ void do_implicit_multiplication_checks(
     MathEquationToken previous_token = previous_infix.tokens[i-1];
 
     if (previous_token.type == MathParenthasisClosedToken &&
-            token.type != MathOperatorToken) {
+            token.type != MathOperatorToken &&
+            previous_token.type != MathParenthasisClosedToken ) {
         // triggers for cases like this.
         // ...)2 or ...)sin(2) or ...)(... but not for ...)+x
         add_token(
@@ -253,11 +254,11 @@ InfixEquation convert_lexed_to_infix_unary(InfixEquation previous_infix) {
 InfixEquation convert_lexed_to_infix(LexerResult lexed) {
     // adds implicit multiplication, convert to unary operators, etc
     // this will then be used to for converting to postfix 
-    bool expecting_value = true;
     InfixEquation only_division = convert_lexed_to_infix_only_division(lexed);
     InfixEquation with_implicit = convert_lexed_to_infix_multiplication(only_division);
     free_equation(only_division);
     InfixEquation result = convert_lexed_to_infix_unary(with_implicit);
+
     free_equation(with_implicit);
 
     return result;

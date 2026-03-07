@@ -2,6 +2,7 @@
 #include "tests.h"
 #include <stddef.h>
 #include <stdlib.h>
+#include <time.h>
 #include <string.h>
 
 int main() {
@@ -12,6 +13,8 @@ int main() {
         {"a+a+a-b+3a", "+(*(6,a),u_-(b))"},
         {"0*a+b", "b"},
         {"a^(-2)*a^5", "^(a,3)"},
+        {"a/b+c/d", "*(+(*(a,d),*(b,c)),^(*(b,d),u_-(1)))"},
+        {"(xa+ya)/(a*a)", "*(+(x,y),^(a,u_-(1)))"},
         {"a+b+a", "+(*(2,a),b)",},
         {"a+b-a+c-b", "c"},
         {"bd + ba", "*(+(a,d),b)"},
@@ -37,8 +40,12 @@ int main() {
         { "a^2 + 2*a*b + b^2 - (a+b)^2","0" },
         { "x^2/x^2", "1"},
         {"ab/ab", "1"},
+        { "(1/a) / (1/b)", "*(^(a,u_-(1)),b)"},
         { NULL, NULL }
     };
+
+
+    clock_t starting_clocks = clock();
 
     size_t i = 0;
 
@@ -70,4 +77,7 @@ int main() {
     }
 
     printf("passed %zu out of %zu\n", passed, passed+failed); 
+    clock_t ending_clocks = clock();
+    clock_t delta_clocks = ending_clocks - starting_clocks;
+    printf("Done in: %lfs\n", (double)delta_clocks / CLOCKS_PER_SEC);
 }

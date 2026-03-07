@@ -33,3 +33,9 @@ void print_ast_as_string(AstNode *node) {
     printf("%s\n", as_string);
     free(as_string);
 }
+
+void print_ast_as_equation(AstNode *node) {
+    char *as_eq = ast_node_to_equation(node);
+    printf("%s\n", as_eq);
+    free(as_eq);
+}

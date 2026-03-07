@@ -100,20 +100,20 @@ void simplify_node_thing(AstNode *node) {
 
     ast_node_division_into_multiplication(node);
     ast_node_concated_power_into_multiplication(node);
-
-    ast_node_concat_operators(node);
-
     ast_node_simplify_multiplication_convert_to_power(node);
     ast_node_subtraction_into_negated_addition(node);
+
+    ast_node_concat_operators(node);
     sort_node(node);
 
-    size_t i = 0;
-    for(; i < 10; i++) {
+    AstNode *before = deep_clone_node(node);
 
+    for(size_t i = 0; i < 50; i++) {
+
+        ast_node_simplify_multipliaction_by_1(node);
         ast_node_simplify_double_unary(node);
         ast_node_expand_unary(node);
 
-        ast_node_simplify_multipliaction_by_1(node);
         ast_node_conditionaly_expand_power(node);
         ast_node_expand_multiplicated_power(node);
         ast_node_expand_multipcation(node);
@@ -129,7 +129,18 @@ void simplify_node_thing(AstNode *node) {
         ast_node_constant_fold(node);
         sort_node(node);
         ast_node_simplify_power_identities(node);
+        ast_node_simplify_multipliaction_by_1(node);
+
+        ast_node_simplify_addition_with_fractions(node);
+
+        if (ast_node_is_same_node(before, node)) {
+            break;
+        }
+        free_ast(before);
+        before = deep_clone_node(node);
     }
+
+    free_ast(before);
 
     ast_node_simplify_same_multiplicator_addition(node);
     sort_node(node);
@@ -160,10 +171,13 @@ AstNode *string_to_ast_node(char *input) {
 AstNode *deep_clone_node(AstNode *node) {
     AstNode *result = create_new_node(node->type, node->name);
 
+    result->children_ptrs = calloc(node->child_count, sizeof(AstNode*));
+
     for(size_t i = 0; i < node->child_count; i++) {
         AstNode *child = node->children_ptrs[i];
-        append_child_node(result, deep_clone_node(child));
+        result->children_ptrs[i] = deep_clone_node(child);
     }
+    result->child_count = node->child_count;
     
     return result;
 }

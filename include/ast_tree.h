@@ -50,13 +50,19 @@ void ast_free_children(AstNode *node);
 
 void print_ast_tree_as_graphviz(AstNode *node);
 void print_ast_as_string(AstNode *node);
+void print_ast_as_equation(AstNode *node);
 
 char *ast_node_to_string(AstNode* node);
+char *ast_node_to_equation(AstNode *node);
 
 bool ast_node_is_same_node(AstNode *node_a, AstNode *node_b);
 bool ast_node_only_contains_numbers(AstNode *node);
+bool ast_node_matches_requirements(
+    AstNode *node,
+    MathEquationTokenType type, 
+    char *name
+);
 
-char *ast_node_to_equation(AstNode *node);
 
 // simplifying
 
@@ -76,6 +82,7 @@ bool ast_node_simplify_same_multiplicator_addition(AstNode *node);
 bool ast_node_simplify_multipliaction_by_1(AstNode *node);
 bool ast_node_simplify_double_unary(AstNode *node);
 bool ast_node_simplify_power_identities(AstNode *node);
+bool ast_node_simplify_addition_with_fractions(AstNode *node);
 
 
 #endif
