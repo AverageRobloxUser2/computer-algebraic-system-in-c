@@ -27,6 +27,15 @@ AstNode *create_power_node(AstNode *start_node, size_t succesive_nodes) {
 
 
 void concat_power_nodes(AstNode *parent, AstNode *node) {
+    // current algorithm
+    // we keep a value number_exponent
+    // itterate over all children and compare them with node
+    // if they match then remove the child and increment number_exponent by 1
+    // if they dont match we do extra checks
+    //      1. check if its a power node. ie b*b^2
+    //      2. if power node then we check the base of the power and compare it with node
+    //          if they match proceed
+    //      3. 
     // we deep clone so when we remove children its not freed
     node = deep_clone_node(node);
 
@@ -54,10 +63,10 @@ void concat_power_nodes(AstNode *parent, AstNode *node) {
                         exponent_holder, 
                         deep_clone_node(child_node->children_ptrs[1])
                     );
+                    remove_and_free_child_at_index(parent, i);
+                    i--;
                 }
 
-                remove_and_free_child_at_index(parent, i);
-                i--;
                 continue;
             }
         }
@@ -94,6 +103,7 @@ void concat_power_nodes(AstNode *parent, AstNode *node) {
 }
 
 bool ast_node_simplify_multiplication_convert_to_power(AstNode *node) {
+    // return false;
     for(size_t i = 0; i < node->child_count; i++) {
         ast_node_simplify_multiplication_convert_to_power(
             node->children_ptrs[i]

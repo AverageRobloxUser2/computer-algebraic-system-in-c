@@ -138,3 +138,20 @@ bool ast_node_only_contains_numbers(AstNode *node) {
 
     return all_numbers;
 }
+
+void ast_shallow_free(AstNode *node) {
+    free(node->name);
+    free(node->children_ptrs);
+    node->name = NULL;
+    node->children_ptrs = NULL;
+}
+
+void ast_free_children(AstNode *node) {
+    for(size_t i = 0; i < node->child_count; i++) {
+        free_ast(node->children_ptrs[i]);
+    }
+
+    node->child_count = 0;
+    free(node->children_ptrs);
+    node->children_ptrs = NULL;
+}

@@ -10,8 +10,13 @@ bool simplify_node(AstNode *node) {
         return false;
     }
     AstNode *child = NULL;
-    size_t i;
-    for(i = 0; i < node->child_count; i++){
+    size_t i = 0;
+    if (node->type == MathOperatorToken && *node->name == '^') {
+        // i = 1;
+    } else {
+        i = 0;
+    }
+    for(; i < node->child_count; i++){
         AstNode *current_child = node->children_ptrs[i];
 
 

@@ -1,5 +1,6 @@
 #include "ast_tree.h"
 #include "math_equation.h"
+#include <math.h>
 #include <stddef.h>
 
 
@@ -16,25 +17,37 @@ bool ast_node_simplify_power_identities(AstNode *node) {
         return false;
     }
 
-    if (node->child_count != 2) {
-        return false;
+    for(size_t i = 1; i < node->child_count; i++) {
+        AstNode *exponent = node->children_ptrs[i];
+        double number_value = 0;
+
+        if (exponent->type != MathNumberToken && exponent->type != MathUnaryOperatorToken) {
+            continue;
+        }
+
+        if (exponent->type == MathUnaryOperatorToken) {
+            if (*exponent->name == '-' &&  ast_node_only_contains_numbers(exponent)) {
+                number_value = -exponent->children_ptrs[0]->value;
+            } else {
+                continue;
+            }
+        } else {
+            number_value = exponent->value;
+        }
+
+        if (number_value == 0) {
+            ast_free_children(node);
+            replace_node_with_another(node, create_number_node(1));
+        } else if (number_value == 1) {
+            remove_and_free_child_at_index(node, i);
+            i--;
+        }
     }
 
-    AstNode *first_thing = node->children_ptrs[0];
-    AstNode *exponent = node->children_ptrs[1];
 
-    if (exponent->type != MathNumberToken) {
-        return false;
+    if (node->child_count == 1) {
+        replace_node_with_another(node, node->children_ptrs[0]);
     }
 
-    if (exponent->value == 1) {
-        free_ast(exponent);
-        replace_node_with_another(node, first_thing);
-        return true;
-    } else if (exponent->value == 0) {
-        free_ast(exponent);
-        free_ast(first_thing);
-        replace_node_with_another(node, create_number_node(1));
-        return true;
-    }
+    return true;
 }

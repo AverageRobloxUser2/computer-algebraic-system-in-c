@@ -18,7 +18,6 @@ include_directories("include")
 add_executable("rpn" "src/main.c")
 add_executable("test_infix" "src/tests/infix.c")
 add_executable("test_postfix" "src/tests/postfix.c")
-add_executable("test_rules" "src/tests/test_rules.c")
 add_executable("test_simplify" "src/tests/simplification.c")
 
 add_library(
@@ -50,6 +49,7 @@ add_library(
     "src/ast_tree/simplify/power_identities.c"
     "src/ast_tree/simplify/expand_multiplicated_power.c"
     "src/ast_tree/simplify/expand_multiplication.c"
+    "src/ast_tree/simplify/conditional_expand_power.c"
 )
 
 target_link_libraries(
@@ -70,11 +70,6 @@ target_link_libraries(
 #
 target_link_libraries(
     "test_postfix"
-    cas
-)
-
-target_link_libraries(
-    "test_rules"
     cas
 )
 

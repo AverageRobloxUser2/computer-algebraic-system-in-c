@@ -36,6 +36,7 @@ void append_child_node(AstNode *parent, AstNode *node);
 void remove_and_free_child_at_index(AstNode *parent, size_t index);
 void remove_and_free_child(AstNode *parent, AstNode *child);
 
+
 void replace_node_with_another(AstNode *node, AstNode *replacment);
 
 int find_child_index(AstNode *parent, AstNode *child);
@@ -43,7 +44,9 @@ int find_child_index(AstNode *parent, AstNode *child);
 AstNode *postfix_to_ast(PostfixEquation postfix);
 AstNode *string_to_ast_node(char *input);
 
-void free_ast(AstNode *);
+void free_ast(AstNode *node);
+void ast_shallow_free(AstNode *node);
+void ast_free_children(AstNode *node);
 
 void print_ast_tree_as_graphviz(AstNode *node);
 void print_ast_as_string(AstNode *node);
@@ -60,6 +63,7 @@ char *ast_node_to_equation(AstNode *node);
 bool ast_node_concat_operators(AstNode *node); 
 bool ast_node_concated_power_into_multiplication(AstNode *node);
 bool ast_node_expand_unary(AstNode *node);
+bool ast_node_conditionaly_expand_power(AstNode *node);
 bool ast_node_subtraction_into_negated_addition(AstNode *node);
 bool ast_node_division_into_multiplication(AstNode *node);
 bool ast_node_expand_multiplicated_power(AstNode *node);

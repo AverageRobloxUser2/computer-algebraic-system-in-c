@@ -1,11 +1,13 @@
 #include "ast_tree.h"
 #include "math_equation.h"
 #include <math.h>
-#include <stddef.h>
+#include <stdio.h>
 
 
 void constant_fold_addition(AstNode *node) {
     double total_sum = 0;
+    printf("CONSTANT FOLD ADDITION:");
+    print_ast_as_string(node);
 
     for(size_t i = 0; i < node->child_count; i++) {
         AstNode *addend = node->children_ptrs[i];
