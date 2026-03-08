@@ -72,6 +72,9 @@ Benjamin Netanyahu if you can hear this, please smite down any memory bugs.
 2. find least common denominator for nodes (*(Number, ^(Number, -1)))
 3. better to equation function that would take precedence into account
     1. maybe make it output latex idk (optional ig)
-4. shell to interact with the system with
+4. shell to interact with the system with result of previous call could be 
+    stored in variables _p1 for the most recent, and _p2 for the second most recent etc.
 5. ability to solve for variables
 6. functions, would integrate with term rewrite system ig
+7. solve_for function solve_for(left, right, variable)
+    example usage solve_for(mv^2/2, E, v) would result in (2E/m)^(1/2)
