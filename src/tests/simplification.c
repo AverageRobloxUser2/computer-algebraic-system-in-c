@@ -79,8 +79,9 @@ int main() {
             print_as_failed(test_case, equation);
         }
 
-        free_ast(node);
         free(equation);
+
+        free_ast(node);
     }
 
     printf("Passed %zu out of %zu\n", passed, passed+failed); 

@@ -52,26 +52,28 @@ void sort_node(AstNode *node) {
         }
     }
 
-    qsort(
-            node->children_ptrs,
-            node->child_count,
-            sizeof(AstNode*),
-            compare_two_nodes_for_sorting
-    );
+    if (node->child_count > 10) {
+        qsort(
+                node->children_ptrs,
+                node->child_count,
+                sizeof(AstNode*),
+                compare_two_nodes_for_sorting
+        );
+    } else {
+        for(size_t i = 0; i < node->child_count-1; i++) {
+            AstNode *child_a = node->children_ptrs[i];
+            for(size_t j = i + 1; j < node->child_count; j++) {
+                AstNode *child_b = node->children_ptrs[j];
 
-    for(size_t i = 0; i < node->child_count-1; i++) {
-        AstNode *child_a = node->children_ptrs[i];
-        for(size_t j = i + 1; j < node->child_count; j++) {
-            AstNode *child_b = node->children_ptrs[j];
+                if (compare_two_nodes_for_sorting(&child_a, &child_b) < 0) {
+                    continue;
+                }
 
-            if (compare_two_nodes_for_sorting(child_a, child_b)) {
-                continue;
+                node->children_ptrs[i] = child_b;
+                node->children_ptrs[j] = child_a;
+
+                child_a = node->children_ptrs[i];
             }
-
-            node->children_ptrs[i] = child_b;
-            node->children_ptrs[j] = child_a;
-
-            child_a = node->children_ptrs[i];
         }
     }
 }
