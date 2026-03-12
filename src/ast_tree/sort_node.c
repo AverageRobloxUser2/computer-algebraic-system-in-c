@@ -2,12 +2,41 @@
 #include "math_equation.h"
 #include <stddef.h>
 #include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 
+int compare_two_nodes_for_sorting(const void *node_a_ptr, const void *node_b_ptr) {
+    AstNode *node_a = * (AstNode**)node_a_ptr;
+    AstNode *node_b = * (AstNode**)node_b_ptr;
+    // first numbers,
+    // second variables,
+    // then equations
+    // returns true if node_a should come first
+    if (node_a->type == MathNumberToken && node_b->type != MathNumberToken) {
+        return -1;
+    } else if (node_b->type == MathNumberToken && node_a->type != MathNumberToken) {
+        return 1;
+    } else if (node_a->type == MathVariableToken && node_b->type != MathVariableToken){
+        return -1;
+    } else if (node_b->type == MathVariableToken && node_a->type != MathVariableToken){
+        return 1;
+    } else if (node_a->type != MathUnaryOperatorToken && node_b->type == MathUnaryOperatorToken) {
+        return -1;
+    } else if (node_b->type != MathUnaryOperatorToken && node_a->type == MathUnaryOperatorToken) {
+        return 1;
+    }
+
+    int difference = strcmp(node_a->name, node_b->name);
+
+    if (difference < 0) {
+        return -1;
+    }
+
+    return 1;
+}
 
 void sort_node(AstNode *node) {
-
     for(size_t i = 0; i < node->child_count; i++) {
         AstNode *child_node = node->children_ptrs[i];
         sort_node(child_node);
@@ -23,27 +52,26 @@ void sort_node(AstNode *node) {
         }
     }
 
+    qsort(
+            node->children_ptrs,
+            node->child_count,
+            sizeof(AstNode*),
+            compare_two_nodes_for_sorting
+    );
 
-    for(size_t i = 0; i < node->child_count; i++) {
-        AstNode *child_node_i = node->children_ptrs[i];
-        size_t best_node_index = i;
-        char *i_node_string = ast_node_to_string(child_node_i);
-        int smallest_difference = 0;
+    for(size_t i = 0; i < node->child_count-1; i++) {
+        AstNode *child_a = node->children_ptrs[i];
         for(size_t j = i + 1; j < node->child_count; j++) {
-            AstNode *child_node_j = node->children_ptrs[j];
-            char *j_node_string = ast_node_to_string(child_node_j);
-            int difference = strcmp(i_node_string, j_node_string);
-            
-            if (difference > smallest_difference) {
-                smallest_difference = difference;
-                best_node_index = j;
+            AstNode *child_b = node->children_ptrs[j];
+
+            if (compare_two_nodes_for_sorting(child_a, child_b)) {
+                continue;
             }
-            free(j_node_string);
+
+            node->children_ptrs[i] = child_b;
+            node->children_ptrs[j] = child_a;
+
+            child_a = node->children_ptrs[i];
         }
-        free(i_node_string);
-
-        node->children_ptrs[i] = node->children_ptrs[best_node_index];
-        node->children_ptrs[best_node_index] = child_node_i;
-
     }
 }

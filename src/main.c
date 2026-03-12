@@ -11,6 +11,7 @@ void do_things(char *input) {
     // printf("%s -> %s\n", input, eq);
     // ast_node_simplify_addition_with_fractions(node);
     // print_ast_as_string(node);
+    sort_node(node);
     print_ast_as_equation(node);
     // free(eq);
     free_ast(node);

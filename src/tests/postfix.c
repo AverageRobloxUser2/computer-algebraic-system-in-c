@@ -85,6 +85,7 @@ int main() {
         {"-a+a", "a-a+"},
         {"(1/a)/(1/b)", "1a/1b//"},
         {"(x+2)x", "x2+x*"},
+        {"set(a,b,c)", "abcset"},
         // just for testing length, sicne i found some mem bugs.
         // {"qwertyuiopasdfghjklzxcvbnm", "qw*e*r*t*y*u*i*o*p*a*s*d*f*g*h*j*k*l*z*x*c*v*b*n*m*"},
         {NULL, NULL},

@@ -221,6 +221,11 @@ LexerResult lex(char *input) {
             continue;
         }
 
+        if (*current_ptr == ',') {
+            current_ptr++;
+            continue;
+        }
+
 
         printf("Failed on %s", current_ptr);
 

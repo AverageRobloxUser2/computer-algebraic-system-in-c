@@ -76,15 +76,19 @@ void constant_fold_power(AstNode *node) {
     }
 
     float result = node->children_ptrs[0]->value;
-    remove_and_free_child_at_index(node, 0);
-    for(size_t i = 0; i < node->child_count; i++) {
+    for(size_t i = 1; i < node->child_count; i++) {
         AstNode *child = node->children_ptrs[i];
+        double int_part = 0;
+
+        if (modf(child->value, &int_part) != 0) {
+            return;
+        }
+
         result = powf(result, child->value);
-        remove_and_free_child_at_index(node, i);
-        i--;
     }
 
 
+    ast_free_children(node);
     replace_node_with_another(node, create_number_node(result));
 }
 

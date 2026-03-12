@@ -103,6 +103,7 @@ void simplify_node_thing(AstNode *node) {
     ast_node_concated_power_into_multiplication(node);
     ast_node_simplify_multiplication_convert_to_power(node);
     ast_node_subtraction_into_negated_addition(node);
+    ast_node_expand_negated_addition(node);
 
     ast_node_concat_operators(node);
     sort_node(node);
@@ -122,22 +123,18 @@ void simplify_node_thing(AstNode *node) {
 
         ast_node_simplify_addition_convert_to_multiplication(node);
         ast_node_simplify_multiplication_convert_to_power(node);
-        sort_node(node);
 
         ast_node_concated_power_into_multiplication(node);
         ast_node_concat_operators(node);
 
         ast_node_simplify_multipliaction_by_1(node);
 
-
-        sort_node(node);
         ast_node_constant_fold(node);
         sort_node(node);
         ast_node_simplify_power_identities(node);
         ast_node_constant_fold(node);
 
         ast_node_simplify_addition_with_fractions(node);
-
 
         if (ast_node_is_same_node(before, node)) {
             break;
@@ -205,6 +202,52 @@ void append_combination(
     (*combinations_ptr)[(*combination_count_ptr) - 1] = new_combination;
 }
 
+void append_operator_combination(
+        char*** combinations_ptr,
+        size_t *combination_count_ptr,
+        AstNode *parent
+) {
+    size_t parent_precedence = get_precedence_for_operator(*parent->name);
+
+    char *child_equation = NULL;
+
+    for(size_t i = 0; i < parent->child_count; i++) {
+        AstNode *child = parent->children_ptrs[i];
+        if (child_equation != NULL) {
+            free(child_equation);
+        }
+        child_equation = ast_node_to_equation(child);
+
+        if (i > 0) {
+            // appends the operator name ie "*" or "+" to the combination
+            // this is used for nodes with more children
+            // such as "+(a,b,c)" would be "a + b + c"
+            append_combination(combinations_ptr, combination_count_ptr, parent->name);
+        }
+
+        if (child->type != MathOperatorToken) {
+            append_combination(combinations_ptr, combination_count_ptr, child_equation);
+            continue;
+        }
+        size_t child_precedence = get_precedence_for_operator(*child->name);
+
+        if (child_precedence < parent_precedence) {
+            append_combination(combinations_ptr, combination_count_ptr, "(");
+            append_combination(combinations_ptr, combination_count_ptr, child_equation);
+            append_combination(combinations_ptr, combination_count_ptr, ")");
+            continue;
+        } else {
+            append_combination(combinations_ptr, combination_count_ptr, child_equation);
+            continue;
+        }
+
+    }
+
+    if (child_equation != NULL) {
+        free(child_equation);
+    }
+}
+
 char *ast_node_to_equation(AstNode *node) {
     char ** combinations = NULL;
     size_t combination_count = 0;
@@ -218,8 +261,17 @@ char *ast_node_to_equation(AstNode *node) {
                 node->name
             );
             break;
-        case MathOperatorToken:
         case MathFunctionToken:
+            append_combination(
+                &combinations,
+                &combination_count,
+                "fn_"
+            );
+            append_combination(
+                &combinations,
+                &combination_count,
+                node->name
+            );
             append_combination(
                 &combinations,
                 &combination_count,
@@ -232,26 +284,14 @@ char *ast_node_to_equation(AstNode *node) {
                 first_equation
             );
             free(first_equation);
-            for(size_t i = 1; i < node->child_count; i++) {
-                AstNode *child = node->children_ptrs[i];
-                append_combination(
-                    &combinations,
-                    &combination_count,
-                    node->name
-                );
-                char *equation = ast_node_to_equation(child);
-                append_combination(
-                    &combinations,
-                    &combination_count,
-                    equation
-                );
-                free(equation);
-            }
             append_combination(
                 &combinations,
                 &combination_count,
                 ")"
             );
+            break;
+        case MathOperatorToken:
+            append_operator_combination(&combinations, &combination_count, node);
             break;
         case MathUnaryOperatorToken:
             append_combination(

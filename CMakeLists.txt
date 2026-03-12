@@ -51,6 +51,7 @@ add_library(
     "src/ast_tree/simplify/expand_multiplication.c"
     "src/ast_tree/simplify/conditional_expand_power.c"
     "src/ast_tree/simplify/addition_with_fractions.c"
+    "src/ast_tree/simplify/negated_addition_expansion.c"
 )
 
 target_link_libraries(

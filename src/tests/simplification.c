@@ -8,17 +8,20 @@
 int main() {
     TestCase tests[] = {
         {"a", "a",},
+        {"--(b+d)", "+(b,d)",},
+        {"0-(b-d)", "+(d,u_-(b))",},
+        {"-(b-d)", "+(d,u_-(b))",},
         {"aa", "^(a,2)",},
-        {"bada", "*(^(a,2),b,d)",},
+        {"bada", "*(b,d,^(a,2))",},
         {"a+a+a-b+3a", "+(*(6,a),u_-(b))"},
         {"0*a+b", "b"},
         {"a^(-2)*a^5", "^(a,3)"},
         {"a/b+c/d", "*(+(*(a,d),*(b,c)),^(*(b,d),u_-(1)))"},
         {"(xa+ya)/(a*a)", "*(+(x,y),^(a,u_-(1)))"},
         {"(xa+ya)/a^2", "*(+(x,y),^(a,u_-(1)))"},
-        {"a+b+a", "+(*(2,a),b)",},
+        {"a+b+a", "+(b,*(2,a))",},
         {"a+b-a+c-b", "c"},
-        {"bd + ba", "*(+(a,d),b)"},
+        {"bd + ba", "*(b,+(a,d))"},
         {"a - a", "0"},
         {"(c+d)^4*(c+d)^(b+a)", "^(+(c,d),+(4,a,b))"},
         {"2x-x", "x"},
@@ -41,8 +44,8 @@ int main() {
         { "a^2 + 2*a*b + b^2 - (a+b)^2","0" },
         { "x^2/x^2", "1"},
         { "ab/ab", "1"},
-        { "(1/a) / (1/b)", "*(^(a,u_-(1)),b)"},
-        { "(2x+3a)^2", "+(*(12,a,x),*(4,^(x,2)),*(9,^(a,2)))"},
+        { "(1/a) / (1/b)", "*(b,^(a,u_-(1)))"},
+        { "(2x+3a)^2", "+(*(4,^(x,2)),*(12,a,x),*(9,^(a,2)))"},
         { "2x(2x+3a)", "+(*(4,^(x,2)),*(6,a,x))"},
         { "1/3+1/6", "*(9,^(18,u_-(1)))"},
         { NULL, NULL }
@@ -67,7 +70,6 @@ int main() {
 
         bool test_passed = strcmp(test_case.output, equation) == 0;
 
-        free_ast(node);
 
         if (test_passed) {
             passed ++;
@@ -77,11 +79,12 @@ int main() {
             print_as_failed(test_case, equation);
         }
 
+        free_ast(node);
         free(equation);
     }
 
-    printf("passed %zu out of %zu\n", passed, passed+failed); 
+    printf("Passed %zu out of %zu\n", passed, passed+failed); 
     clock_t ending_clocks = clock();
     clock_t delta_clocks = ending_clocks - starting_clocks;
-    printf("Done in: %lfs\n", (double)delta_clocks / CLOCKS_PER_SEC);
+    printf("%lfs\n", (double)delta_clocks / CLOCKS_PER_SEC);
 }

@@ -75,6 +75,7 @@ bool ast_node_division_into_multiplication(AstNode *node);
 bool ast_node_expand_multiplicated_power(AstNode *node);
 bool ast_node_expand_multipcation(AstNode *node);
 bool ast_node_constant_fold(AstNode *node);
+bool ast_node_expand_negated_addition(AstNode *node);
 
 bool ast_node_simplify_multiplication_convert_to_power(AstNode *node);
 bool ast_node_simplify_addition_convert_to_multiplication(AstNode *node);
