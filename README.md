@@ -1,3 +1,4 @@
+# ts has no libraries, only std, ig glibc since i use reallocarray, but thats it
 # how to run?
 ```
 git clone https://github.com/AverageRobloxUser2/computer-algebraic-system-in-c/
