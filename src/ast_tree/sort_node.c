@@ -54,10 +54,10 @@ void sort_node(AstNode *node) {
 
     if (node->child_count > 10) {
         qsort(
-                node->children_ptrs,
-                node->child_count,
-                sizeof(AstNode*),
-                compare_two_nodes_for_sorting
+            node->children_ptrs,
+            node->child_count,
+            sizeof(AstNode*),
+            compare_two_nodes_for_sorting
         );
     } else {
         for(size_t i = 0; i < node->child_count-1; i++) {

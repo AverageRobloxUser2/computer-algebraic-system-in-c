@@ -84,6 +84,7 @@ bool ast_node_simplify_multipliaction_by_1(AstNode *node);
 bool ast_node_simplify_double_unary(AstNode *node);
 bool ast_node_simplify_power_identities(AstNode *node);
 bool ast_node_simplify_addition_with_fractions(AstNode *node);
+bool ast_node_simplify_fractions_by_gcd(AstNode *node);
 
 
 #endif

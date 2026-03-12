@@ -131,6 +131,7 @@ void simplify_node_thing(AstNode *node) {
 
         ast_node_constant_fold(node);
         sort_node(node);
+        ast_node_simplify_fractions_by_gcd(node);
         ast_node_simplify_power_identities(node);
         ast_node_constant_fold(node);
 

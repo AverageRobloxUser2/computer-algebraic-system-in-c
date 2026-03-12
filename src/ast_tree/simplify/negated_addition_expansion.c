@@ -30,6 +30,7 @@ bool ast_node_expand_negated_addition(AstNode *node) {
         result_node->children_ptrs[i] = negate_node;
     }
 
-    ast_shallow_free(node);
+    ast_shallow_free(addition_node);
+    free(addition_node);
     replace_node_with_another(node, result_node);
 }
