@@ -11,7 +11,12 @@ AstNode *pop_node_from_stack(AstNode ***node_stack_ptr, size_t *node_count_ptr) 
 
     (*node_count_ptr)--;
     AstNode *last_node = (*node_stack_ptr)[*node_count_ptr];
-    *node_stack_ptr = reallocarray(*node_stack_ptr, *node_count_ptr, sizeof(AstNode*));
+    if (*node_count_ptr > 0) {
+        *node_stack_ptr = reallocarray(*node_stack_ptr, *node_count_ptr, sizeof(AstNode*));
+    } else {
+        free(*node_stack_ptr);
+        *node_stack_ptr = NULL;
+    }
 
     return last_node;
 }

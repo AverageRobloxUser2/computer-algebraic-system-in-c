@@ -9,12 +9,19 @@ MathEquationToken pop_from_operator_stack(
     size_t *operator_stack_count_ptr
 ) {
     MathEquationToken last_value = (*operator_stack_ptr)[*operator_stack_count_ptr - 1];
-    *operator_stack_ptr = reallocarray(
-        *operator_stack_ptr,
-        (*operator_stack_count_ptr)-1,
-        sizeof(MathEquationToken)
-    );
     (*operator_stack_count_ptr)--;
+    if (*operator_stack_count_ptr > 0) {
+
+        *operator_stack_ptr = reallocarray(
+            *operator_stack_ptr,
+            (*operator_stack_count_ptr),
+            sizeof(MathEquationToken)
+        );
+
+    } else {
+        free(*operator_stack_ptr);
+        *operator_stack_ptr =  NULL;
+    }
 
     return last_value;
 }
@@ -186,35 +193,18 @@ PostfixEquation convert_infix_to_postfix(InfixEquation equation) {
             //
             continue;
         } else if (token.type == MathFunctionToken) {
-            operator_stack = reallocarray(
-                operator_stack,
-                operator_stack_count+1,
-                sizeof(MathEquationToken)
-            );
-
-            operator_stack[operator_stack_count] = token;
-            operator_stack_count++;
+            append_to_operator_stack(&operator_stack, &operator_stack_count, token);
         } else if (token.type == MathParenthasisOpenToken) {
-            operator_stack = reallocarray(
-                operator_stack,
-                operator_stack_count+1,
-                sizeof(MathEquationToken)
-            );
-
-            operator_stack[operator_stack_count] = token;
-            operator_stack_count++;
+            append_to_operator_stack(&operator_stack, &operator_stack_count, token);
         } else if (token.type == MathParenthasisClosedToken) {
             while (true) {
                 if (operator_stack_count == 0) {
                     break;
                 }
 
-                operator_stack_count--;
-                MathEquationToken last_token = operator_stack[operator_stack_count];
-                operator_stack = reallocarray(
-                    operator_stack,
-                    operator_stack_count,
-                    sizeof(MathEquationToken)
+                MathEquationToken last_token = pop_from_operator_stack(
+                    &operator_stack,
+                    &operator_stack_count
                 );
 
 
@@ -235,14 +225,10 @@ PostfixEquation convert_infix_to_postfix(InfixEquation equation) {
 
 
     while (operator_stack_count > 0) {
-        MathEquationToken last_token = operator_stack[operator_stack_count-1];
-        operator_stack = reallocarray(
-            operator_stack,
-            operator_stack_count-1,
-            sizeof(MathEquationToken)
+        MathEquationToken last_token = pop_from_operator_stack(
+            &operator_stack,
+            &operator_stack_count
         );
-        operator_stack_count--;
-
         add_token(
             &result,
             new_token(
