@@ -22,7 +22,7 @@ int find_gcd_euclids_algorithm(int a, int b) {
         value_min = a;
     }
 
-    return find_gcd_euclids_algorithm(value_min, value_max % value_max);
+    return find_gcd_euclids_algorithm(value_min, value_max % value_min);
 }
 
 bool ast_node_simplify_fractions_by_gcd(AstNode *node) {
