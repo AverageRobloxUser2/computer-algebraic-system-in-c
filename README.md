@@ -60,7 +60,7 @@ Passed 42 out of 42
 0.002606s
 ```
 
-# valgrind, for the 38 tests
+# valgrind, for the simplification tests
 Benjamin Netanyahu if you can hear this, please smite down any memory bugs. 
 ```txt
 ==38720== 
@@ -74,7 +74,7 @@ Benjamin Netanyahu if you can hear this, please smite down any memory bugs.
 ==38720== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
 ```
 
-# hyperfine benchmark for 1k runs
+# hyperfine benchmark for 1k runs, of the simplification tests
 ```
 $ hyperfine --runs 1000 -N --warmup 100 "./test_simplify"
 Benchmark 1: ./test_simplify
